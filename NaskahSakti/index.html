@@ -1,0 +1,2260 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NaskahSakti – Platform Advokasi & Administrasi Warga</title>
+    <meta name="description"
+        content="Platform pembuatan dokumen formal berbasis AI untuk organisasi komunitas dan warga desa. Proposal, Surat Audiensi, dan Press Release otomatis." />
+
+    <!-- Tailwind CSS + Typography Plugin -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com/3.4.0/tailwind.min.js"></script>
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.5.1/github-markdown.min.css" />
+
+    <!-- Marked.js -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+    <!-- Supabase JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap"
+        rel="stylesheet" />
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#ecfdf5', 100: '#d1fae5', 200: '#a7f3d0',
+                            300: '#6ee7b7', 400: '#34d399', 500: '#10b981',
+                            600: '#059669', 700: '#047857', 800: '#065f46', 900: '#064e3b',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* =========================================
+       GLOBAL RESET & BASE
+    ========================================= */
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0f172a;
+            color: #e2e8f0;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* =========================================
+       SCROLLBAR STYLING
+    ========================================= */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #1e293b;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #10b981;
+        }
+
+        /* =========================================
+       NAVBAR
+    ========================================= */
+        #navbar {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            border-bottom: 1px solid rgba(16, 185, 129, 0.15);
+            backdrop-filter: blur(12px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+        }
+
+        .logo-text {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: linear-gradient(135deg, #10b981, #34d399, #6ee7b7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+
+        .logo-badge {
+            background: linear-gradient(135deg, #10b981, #047857);
+            color: white;
+            font-size: 9px;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 4px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            vertical-align: middle;
+            margin-left: 4px;
+        }
+
+        /* =========================================
+       NAV TABS
+    ========================================= */
+        .nav-tab {
+            position: relative;
+            padding: 8px 20px;
+            font-weight: 500;
+            font-size: 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            color: #94a3b8;
+            border: 1px solid transparent;
+            letter-spacing: 0.2px;
+        }
+
+        .nav-tab:hover {
+            color: #e2e8f0;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .nav-tab.active {
+            color: #10b981;
+            background: rgba(16, 185, 129, 0.08);
+            border-color: rgba(16, 185, 129, 0.3);
+        }
+
+        .nav-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #10b981, transparent);
+            border-radius: 2px;
+        }
+
+        /* =========================================
+       VIEWS
+    ========================================= */
+        .view {
+            display: none;
+        }
+
+        .view.active {
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* =========================================
+       CARD COMPONENTS
+    ========================================= */
+        .card {
+            background: linear-gradient(135deg, #1e293b 0%, #162032 100%);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 16px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.25);
+        }
+
+        .card-header {
+            padding: 20px 24px 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-title {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 700;
+            font-size: 15px;
+            color: #f1f5f9;
+        }
+
+        .card-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(4, 120, 87, 0.2));
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            flex-shrink: 0;
+        }
+
+        .card-body {
+            padding: 20px 24px;
+        }
+
+        /* =========================================
+       FORM ELEMENTS
+    ========================================= */
+        .form-label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: #94a3b8;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+
+        .form-input,
+        .form-select,
+        .form-textarea {
+            width: 100%;
+            background: rgba(15, 23, 42, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            padding: 10px 14px;
+            font-size: 14px;
+            color: #e2e8f0;
+            outline: none;
+            transition: all 0.2s ease;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
+            border-color: rgba(16, 185, 129, 0.5);
+            background: rgba(15, 23, 42, 0.9);
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.08);
+        }
+
+        .form-input::placeholder,
+        .form-textarea::placeholder {
+            color: #475569;
+        }
+
+        .form-select {
+            cursor: pointer;
+        }
+
+        .form-select option {
+            background: #1e293b;
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 80px;
+            line-height: 1.6;
+        }
+
+        /* =========================================
+       BUTTONS
+    ========================================= */
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 11px 22px;
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            font-weight: 600;
+            font-size: 14px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.25);
+            width: 100%;
+            letter-spacing: 0.2px;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: linear-gradient(135deg, #059669, #047857);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.35);
+        }
+
+        .btn-primary:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        .btn-primary:disabled {
+            background: linear-gradient(135deg, #334155, #1e293b);
+            color: #475569;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .btn-secondary {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 9px 16px;
+            background: rgba(255, 255, 255, 0.05);
+            color: #94a3b8;
+            font-weight: 500;
+            font-size: 13px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.09);
+            color: #e2e8f0;
+            border-color: rgba(255, 255, 255, 0.18);
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 12px;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s ease;
+        }
+
+        .btn-view {
+            background: rgba(16, 185, 129, 0.12);
+            color: #34d399;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .btn-view:hover {
+            background: rgba(16, 185, 129, 0.2);
+            transform: translateY(-1px);
+        }
+
+        /* =========================================
+       LOADING SPINNER
+    ========================================= */
+        .spinner {
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+            flex-shrink: 0;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* =========================================
+       TOAST NOTIFICATIONS
+    ========================================= */
+        #toast-container {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            pointer-events: none;
+        }
+
+        .toast {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 18px;
+            border-radius: 12px;
+            font-size: 13.5px;
+            font-weight: 500;
+            max-width: 340px;
+            pointer-events: all;
+            animation: slideInToast 0.3s ease;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(12px);
+        }
+
+        .toast.success {
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: #6ee7b7;
+        }
+
+        .toast.error {
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #fca5a5;
+        }
+
+        .toast.info {
+            background: rgba(59, 130, 246, 0.15);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            color: #93c5fd;
+        }
+
+        @keyframes slideInToast {
+            from {
+                opacity: 0;
+                transform: translateY(20px) scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        /* =========================================
+       A4 CANVAS – PROFESSIONAL FORMAL DOCUMENT STYLE
+    ========================================= */
+
+        /* Base canvas – screen preview mode */
+        #a4-preview-canvas {
+            font-family: "Times New Roman", Times, serif;
+            font-size: 12pt;
+            line-height: 1.5;
+            text-align: justify;
+            color: #000000;
+            background: #ffffff;
+            width: 210mm;
+            min-height: 297mm;
+            padding: 3cm 2cm 2cm 3cm;
+            /* Top 3cm | Right 2cm | Bottom 2cm | Left 3cm – standard tata naskah dinas */
+            margin: 0 auto;
+            box-shadow: 0 8px 48px rgba(0, 0, 0, 0.45), 0 2px 6px rgba(0, 0, 0, 0.25);
+            box-sizing: border-box;
+        }
+
+        /* ── Headings ─────────────────────────────── */
+        /* All headings share a common baseline */
+        #a4-preview-canvas h1,
+        #a4-preview-canvas h2,
+        #a4-preview-canvas h3,
+        #a4-preview-canvas h4,
+        #a4-preview-canvas h5,
+        #a4-preview-canvas h6 {
+            font-family: "Times New Roman", Times, serif;
+            color: #000000;
+            font-weight: bold;
+            text-align: center;
+            line-height: 1.4;
+            margin-top: 24px;
+            margin-bottom: 10px;
+            page-break-after: avoid;
+            break-after: avoid;
+        }
+
+        /* H1 – Judul Utama Dokumen */
+        #a4-preview-canvas h1 {
+            font-size: 14pt;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            text-decoration: underline;
+            margin-top: 0;
+            margin-bottom: 18px;
+        }
+
+        /* H2 – Judul BAB */
+        #a4-preview-canvas h2 {
+            font-size: 13pt;
+            text-align: left;
+        }
+
+        /* H3 – Sub-bab (misal 1.1, 1.2) */
+        #a4-preview-canvas h3 {
+            font-size: 12pt;
+            text-align: left;
+            font-weight: bold;
+        }
+
+        /* H4 – Sub-sub-bab */
+        #a4-preview-canvas h4 {
+            font-size: 12pt;
+            text-align: left;
+            font-weight: bold;
+            font-style: italic;
+        }
+
+        /* ── Paragraf ─────────────────────────────── */
+        #a4-preview-canvas p {
+            font-family: "Times New Roman", Times, serif;
+            font-size: 12pt;
+            line-height: 1.5;
+            text-align: justify;
+            text-indent: 1.25cm;
+            margin-top: 0;
+            margin-bottom: 10px;
+            color: #000000;
+            orphans: 3;
+            widows: 3;
+        }
+
+        /* Paragraf pertama setelah heading tidak perlu indent */
+        #a4-preview-canvas h1 + p,
+        #a4-preview-canvas h2 + p,
+        #a4-preview-canvas h3 + p,
+        #a4-preview-canvas h4 + p {
+            text-indent: 0;
+        }
+
+        /* ── List (ul / ol) ──────────────────────── */
+        #a4-preview-canvas ul,
+        #a4-preview-canvas ol {
+            font-family: "Times New Roman", Times, serif;
+            font-size: 12pt;
+            line-height: 1.5;
+            color: #000000;
+            margin-left: 1.25cm;   /* align with paragraph text indent */
+            padding-left: 0.75cm;
+            margin-bottom: 10px;
+            margin-top: 0;
+        }
+
+        #a4-preview-canvas li {
+            font-family: "Times New Roman", Times, serif;
+            font-size: 12pt;
+            line-height: 1.5;
+            color: #000000;
+            margin-bottom: 4px;
+            text-align: justify;
+        }
+
+        /* Nested lists */
+        #a4-preview-canvas ul ul,
+        #a4-preview-canvas ol ol,
+        #a4-preview-canvas ul ol,
+        #a4-preview-canvas ol ul {
+            margin-left: 0.75cm;
+            margin-bottom: 4px;
+        }
+
+        /* ── Teks formatting ──────────────────────── */
+        #a4-preview-canvas strong,
+        #a4-preview-canvas b {
+            font-family: "Times New Roman", Times, serif;
+            font-weight: bold;
+            color: #000000;
+        }
+
+        #a4-preview-canvas em,
+        #a4-preview-canvas i {
+            font-family: "Times New Roman", Times, serif;
+            font-style: italic;
+        }
+
+        #a4-preview-canvas hr {
+            border: none;
+            border-top: 2px solid #000000;
+            margin: 24px 0;
+        }
+
+        #a4-preview-canvas blockquote {
+            font-family: "Times New Roman", Times, serif;
+            font-size: 11pt;
+            border-left: 4px solid #555555;
+            padding: 8px 16px;
+            color: #222222;
+            margin: 16px 1.25cm;
+            font-style: italic;
+            background: #f9f9f9;
+        }
+
+        /* ── TABEL (RAB, Matriks, dll.) ──────────── */
+        #a4-preview-canvas table {
+            width: 100% !important;
+            border-collapse: collapse !important;
+            font-family: "Times New Roman", Times, serif;
+            font-size: 11pt;
+            margin-top: 8px;
+            margin-bottom: 20px;
+            page-break-inside: avoid;
+            break-inside: avoid;
+        }
+
+        #a4-preview-canvas thead tr {
+            page-break-after: avoid;
+            break-after: avoid;
+        }
+
+        #a4-preview-canvas th {
+            background-color: #d1d5db !important;   /* abu formal */
+            font-weight: bold;
+            text-align: center;
+            vertical-align: middle;
+            border: 1px solid #000000 !important;
+            padding: 7px 10px !important;
+            font-family: "Times New Roman", Times, serif;
+            font-size: 11pt;
+            color: #000000 !important;
+        }
+
+        #a4-preview-canvas td {
+            border: 1px solid #000000 !important;
+            padding: 6px 10px !important;
+            font-family: "Times New Roman", Times, serif;
+            font-size: 11pt;
+            vertical-align: top;
+            color: #000000 !important;
+            text-align: left;
+        }
+
+        /* Zebra row shading untuk keterbacaan */
+        #a4-preview-canvas tbody tr:nth-child(even) td {
+            background-color: #f3f4f6;
+        }
+
+        /* Kolom angka (Jumlah, Harga) – rata kanan */
+        #a4-preview-canvas td:last-child,
+        #a4-preview-canvas th:last-child {
+            text-align: right;
+        }
+
+        /* ── Kode inline ──────────────────────────── */
+        #a4-preview-canvas code {
+            font-family: "Courier New", Courier, monospace;
+            font-size: 10pt;
+            background: #f3f4f6;
+            padding: 1px 4px;
+            border-radius: 2px;
+            color: #111111;
+        }
+
+        #a4-preview-canvas pre {
+            font-family: "Courier New", Courier, monospace;
+            font-size: 10pt;
+            background: #f3f4f6;
+            padding: 12px 16px;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+            overflow-x: auto;
+            margin-bottom: 16px;
+            page-break-inside: avoid;
+            break-inside: avoid;
+        }
+
+        /* ── Signature Block (Surat Resmi) ───────── */
+        #a4-preview-canvas .signature-block,
+        #a4-preview-canvas .tanda-tangan {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 40px;
+            page-break-inside: avoid;
+            break-inside: avoid;
+            width: 100%;
+        }
+
+        #a4-preview-canvas .signature-block > div,
+        #a4-preview-canvas .tanda-tangan > div {
+            width: 45%;
+            text-align: center;
+        }
+
+        #a4-preview-canvas.doc-type-surat_audiensi {
+            padding: 1cm 2cm 2cm 2cm !important; /* Kurangi padding atas agar surat tidak terdorong ke halaman baru */
+        }
+
+        #a4-preview-canvas.doc-type-surat_audiensi p,
+        #a4-preview-canvas.doc-type-surat_audiensi h2,
+        #a4-preview-canvas.doc-type-surat_audiensi h3 {
+            margin-block-start: 0;
+            margin-block-end: 0;
+        }
+
+        #a4-preview-canvas.doc-type-surat_audiensi table {
+            border-collapse: collapse;
+            page-break-inside: avoid;
+        }
+
+        #a4-preview-canvas.doc-type-surat_audiensi td,
+        #a4-preview-canvas.doc-type-surat_audiensi th {
+            line-height: 1.4;
+            border: none !important;
+            padding: 2px !important;
+            background: transparent !important;
+        }
+
+        /* ── Placeholder state ────────────────────── */
+        #a4-preview-canvas.placeholder-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+        }
+
+        /* Canvas outer wrapper (scrollable dark bg) */
+        #canvas-wrapper {
+            background: #0d1b2e;
+            overflow-y: auto;
+            padding: 32px 16px;
+            flex: 1;
+        }
+
+        /* =========================================
+       PRINT STYLES – FULL OVERRIDE
+    ========================================= */
+        @media print {
+          /* 1. Sembunyikan SEMUA elemen UI dulu */
+          body * {
+            visibility: hidden !important;
+          }
+
+          /* 2. Tampilkan HANYA canvas dan isinya */
+          #a4-preview-canvas,
+          #a4-preview-canvas * {
+            visibility: visible !important;
+          }
+
+          /* 3. Normalkan aliran dokumen agar multi-halaman tidak overlap */
+          html, body {
+            height: auto !important;
+            overflow: visible !important;
+            background: white !important;
+            margin: 0 !important;
+            padding: 0 !important;
+          }
+
+          /* 4. Canvas: WAJIB position:relative (bukan fixed/absolute)
+                agar konten multi-halaman mengalir ke bawah secara normal */
+          #a4-preview-canvas {
+            position: relative !important;
+            left: auto !important;
+            top: auto !important;
+            width: 100% !important;
+            height: auto !important;       /* KUNCI: jangan height:100vh atau overflow:hidden */
+            min-height: 0 !important;
+            overflow: visible !important;
+            display: block !important;
+            box-shadow: none !important;
+            padding: 0 !important;          /* margin diatur via @page */
+            margin: 0 auto !important;
+            background: white !important;
+            font-size: 12pt !important;
+            line-height: 1.5 !important;
+            page-break-after: avoid !important;
+          }
+
+          /* 5. Wrapper & layout container: lepas semua max-height / overflow */
+          #canvas-wrapper,
+          main,
+          .split-layout {
+            height: auto !important;
+            max-height: none !important;
+            overflow: visible !important;
+            display: block !important;
+            position: static !important;
+            padding: 0 !important;
+            margin: 0 !important;
+          }
+
+          /* 6. Pengaturan halaman fisik A4 */
+          @page {
+            size: A4 portrait;
+            margin: 2cm;
+          }
+
+          /* 7. Ekstrim Normalisasi (Global Layout Reset) */
+          html, body, #a4-preview-canvas, #canvas-wrapper, main, .split-layout {
+            display: block !important;
+            height: auto !important;
+            max-height: none !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            overflow: visible !important;
+            min-height: 0 !important;
+            position: relative !important;
+            justify-content: unset !important;
+            align-content: unset !important;
+            gap: 0 !important;
+          }
+
+          /* Cegah pemotongan ekstrim untuk elemen Surat Audiensi & Press Release agar fit di 1 halaman */
+          #a4-preview-canvas.doc-type-surat_audiensi *,
+          #a4-preview-canvas.doc-type-press_release h1,
+          #a4-preview-canvas.doc-type-press_release h2,
+          #a4-preview-canvas.doc-type-press_release h3,
+          #a4-preview-canvas.doc-type-press_release p,
+          #a4-preview-canvas.doc-type-press_release div {
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
+          }
+
+          #a4-preview-canvas.doc-type-surat_audiensi h2, 
+          #a4-preview-canvas.doc-type-surat_audiensi p, 
+          #a4-preview-canvas.doc-type-surat_audiensi table {
+            page-break-before: avoid !important;
+            page-break-after: avoid !important;
+          }
+
+          /* Aturan dasar keselamatan untuk Proposal & Dokumen Lainnya */
+          #a4-preview-canvas table, #a4-preview-canvas tr, #a4-preview-canvas pre, #a4-preview-canvas blockquote, #a4-preview-canvas .signature-html {
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
+          }
+          #a4-preview-canvas thead {
+            display: table-header-group !important; 
+          }
+          #a4-preview-canvas h1, #a4-preview-canvas h2, #a4-preview-canvas h3, #a4-preview-canvas h4 {
+            page-break-after: avoid !important;
+            break-after: avoid !important;
+            page-break-inside: avoid !important;
+          }
+          #a4-preview-canvas p, #a4-preview-canvas li {
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
+          }
+          #a4-preview-canvas p {
+            orphans: 3 !important;
+            widows: 3 !important;
+          }
+          #a4-preview-canvas.doc-type-surat_audiensi p {
+            margin: 0 0 5px 0 !important;
+          }
+        }
+
+        /* Screen: canvas bisa scroll penuh */
+        #a4-preview-canvas {
+          overflow-y: visible;
+          height: auto;
+        }
+
+        /* =========================================
+       CANVAS TOOLBAR
+    ========================================= */
+        #canvas-toolbar {
+            background: rgba(15, 23, 42, 0.95);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+
+        .toolbar-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #64748b;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+        }
+
+        .toolbar-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        /* =========================================
+       ADMIN TABLE
+    ========================================= */
+        .admin-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        .admin-table thead tr {
+            background: rgba(15, 23, 42, 0.6);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .admin-table th {
+            padding: 12px 16px;
+            text-align: left;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            color: #64748b;
+        }
+
+        .admin-table td {
+            padding: 12px 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            color: #cbd5e1;
+            vertical-align: middle;
+        }
+
+        .admin-table tbody tr {
+            transition: background 0.15s ease;
+        }
+
+        .admin-table tbody tr:hover {
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .admin-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 3px 9px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+        }
+
+        .badge-proposal {
+            background: rgba(59, 130, 246, 0.15);
+            color: #93c5fd;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+        }
+
+        .badge-surat {
+            background: rgba(168, 85, 247, 0.15);
+            color: #d8b4fe;
+            border: 1px solid rgba(168, 85, 247, 0.2);
+        }
+
+        .badge-press {
+            background: rgba(245, 158, 11, 0.15);
+            color: #fcd34d;
+            border: 1px solid rgba(245, 158, 11, 0.2);
+        }
+
+        /* =========================================
+       SECTION DIVIDER
+    ========================================= */
+        .section-divider {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 8px 0 20px;
+        }
+
+        .section-divider span {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            color: #10b981;
+            white-space: nowrap;
+            letter-spacing: 0.3px;
+        }
+
+        .section-divider::before,
+        .section-divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(16, 185, 129, 0.3));
+        }
+
+        .section-divider::before {
+            background: linear-gradient(90deg, rgba(16, 185, 129, 0.3), transparent);
+        }
+
+        /* =========================================
+       ALERT BOXES
+    ========================================= */
+        .alert-warn {
+            background: rgba(245, 158, 11, 0.08);
+            border: 1px solid rgba(245, 158, 11, 0.25);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font-size: 13.5px;
+            color: #fcd34d;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            line-height: 1.5;
+        }
+
+        /* =========================================
+       PRINT STYLES
+    ========================================= */
+        @media print {
+          /* Hide all interactive UI components and other layout wrappers during print */
+          body * {
+            visibility: hidden;
+          }
+          
+          /* Only display the A4 canvas preview content */
+          #a4-preview-canvas,
+          #a4-preview-canvas * {
+            visibility: visible;
+          }
+          
+          #a4-preview-canvas {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100% !important;
+            min-height: 0 !important;
+            height: auto !important;
+            box-shadow: none !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            overflow: visible !important;
+            display: block !important;
+            background: transparent !important;
+          }
+          
+          /* Reset root layout settings for print output compatibility */
+          html, body {
+            height: auto !important;
+            overflow: visible !important;
+            background: white !important;
+          }
+          
+          main, .split-layout, #canvas-wrapper {
+            height: auto !important;
+            max-height: none !important;
+            overflow: visible !important;
+            display: block !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            position: static !important;
+          }
+          
+          /* Apply exact official Indonesian regulatory margins per physical page break (A4, 3cm 2cm 2cm 3cm) */
+          @page {
+            size: A4;
+            margin: 3cm 2cm 2cm 3cm; /* Top Right Bottom Left */
+          }
+          
+          /* Prevent cutting elements horizontally across physical pages */
+          #a4-preview-canvas tr,
+          #a4-preview-canvas p,
+          #a4-preview-canvas h2,
+          #a4-preview-canvas h3 {
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
+          }
+        }
+        /* For screen preview scrolling */
+        #a4-preview-canvas {
+          overflow-y: visible !important;
+          height: auto !important;
+        }
+
+
+        /* =========================================
+       RESPONSIVE
+    ========================================= */
+        @media (max-width: 1024px) {
+            .split-layout {
+                flex-direction: column !important;
+            }
+
+            #canvas-wrapper {
+                padding: 16px 8px;
+            }
+
+            #a4-preview-canvas {
+                width: 100% !important;
+                min-height: unset;
+                padding: 20px !important;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .nav-tab {
+                padding: 6px 12px;
+                font-size: 13px;
+            }
+
+            .card-body {
+                padding: 14px 16px;
+            }
+        }
+
+        /* =========================================
+       MISC ANIMATIONS
+    ========================================= */
+        .fade-in {
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .pulse-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #10b981;
+            animation: pulseDot 1.5s ease-in-out infinite;
+            flex-shrink: 0;
+        }
+
+        @keyframes pulseDot {
+
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            50% {
+                transform: scale(1.4);
+                opacity: 0.6;
+            }
+        }
+
+        /* Generating overlay on canvas */
+        #generating-overlay {
+            display: none;
+            position: absolute;
+            inset: 0;
+            background: rgba(13, 27, 46, 0.85);
+            backdrop-filter: blur(4px);
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 16px;
+            z-index: 10;
+            border-radius: 2px;
+        }
+
+        #generating-overlay.show {
+            display: flex;
+        }
+
+        .gen-spinner {
+            width: 48px;
+            height: 48px;
+            border: 3px solid rgba(16, 185, 129, 0.2);
+            border-top-color: #10b981;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ============================================================
+     NAVBAR
+============================================================ -->
+    <nav id="navbar">
+        <div
+            style="max-width:1400px; margin:0 auto; padding:0 20px; height:60px; display:flex; align-items:center; justify-content:space-between;">
+            <!-- Logo -->
+            <div style="display:flex; align-items:center; gap:12px;">
+                <div
+                    style="width:34px;height:34px;background:linear-gradient(135deg,#10b981,#047857);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;box-shadow:0 4px 12px rgba(16,185,129,0.3);">
+                    📝</div>
+                <div>
+                    <span class="logo-text" style="font-size:18px;">NaskahSakti</span>
+                    <span class="logo-badge">AI</span>
+                </div>
+            </div>
+
+            <!-- Tabs -->
+            <div
+                style="display:flex; align-items:center; gap:6px; background:rgba(0,0,0,0.2); padding:5px; border-radius:12px; border:1px solid rgba(255,255,255,0.05);">
+                <button id="tab-warga" class="nav-tab active" onclick="switchView('warga')">
+                    🏘️ Halaman Warga
+                </button>
+                <button id="tab-admin" class="nav-tab" onclick="switchView('admin')">
+                    ⚙️ Halaman Admin
+                </button>
+            </div>
+
+            <!-- Status -->
+            <div id="api-status" style="display:flex;align-items:center;gap:7px;font-size:12px;color:#64748b;">
+                <div class="pulse-dot" style="background:#64748b;"></div>
+                <span>Memuat...</span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ============================================================
+     TOAST CONTAINER
+============================================================ -->
+    <div id="toast-container"></div>
+
+    <!-- ============================================================
+     PRINT AREA (hidden, used for window.print())
+============================================================ -->
+    <div id="print-area" style="display:none;">
+        <div id="print-canvas"></div>
+    </div>
+
+    <!-- ============================================================
+     MAIN CONTENT
+============================================================ -->
+    <main style="max-width:1400px; margin:0 auto; padding:24px 20px; min-height:calc(100vh - 60px);">
+
+        <!-- ==========================================================
+       VIEW: HALAMAN WARGA
+  ========================================================== -->
+        <div id="view-warga" class="view active fade-in">
+
+            <!-- Alert bar for missing API key -->
+            <div id="api-missing-alert" style="display:none; margin-bottom:20px;">
+                <div class="alert-warn">
+                    <span style="font-size:20px; flex-shrink:0;">⚠️</span>
+                    <span><strong>Perhatian:</strong> Admin harus mengisi API Key Gemini di Halaman Admin dahulu sebelum
+                        fitur AI dapat digunakan.</span>
+                </div>
+            </div>
+
+            <!-- Split layout -->
+            <div class="split-layout" style="display:flex; gap:20px; align-items:flex-start;">
+
+                <!-- LEFT PANEL: Form -->
+                <div style="width:420px; flex-shrink:0; display:flex; flex-direction:column; gap:16px;">
+
+                    <!-- Card: Identitas Komunitas -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-icon">🏘️</div>
+                            <div>
+                                <div class="card-title">Identitas Komunitas</div>
+                                <div style="font-size:11px;color:#64748b;margin-top:2px;">Data organisasi pengaju
+                                    dokumen</div>
+                            </div>
+                        </div>
+                        <div class="card-body" style="display:flex;flex-direction:column;gap:14px;">
+                            <div>
+                                <label class="form-label">Nama Komunitas / Organisasi *</label>
+                                <input id="f-nama-komunitas" class="form-input" type="text"
+                                    placeholder="Contoh: FKPM Desa Sukamaju" />
+                            </div>
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                                <div>
+                                    <label class="form-label">Jenis Komunitas *</label>
+                                    <select id="f-jenis-komunitas" class="form-select">
+                                        <option value="">-- Pilih --</option>
+                                        <option value="Karang Taruna">Karang Taruna</option>
+                                        <option value="PKK">PKK</option>
+                                        <option value="FKPM">FKPM</option>
+                                        <option value="BPD">BPD</option>
+                                        <option value="BUMDES">BUMDES</option>
+                                        <option value="LSM">LSM</option>
+                                        <option value="Komunitas Warga">Komunitas Warga</option>
+                                        <option value="Lainnya">Lainnya</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="form-label">Wilayah / Desa *</label>
+                                    <input id="f-wilayah" class="form-input" type="text"
+                                        placeholder="Contoh: Desa Sukamaju, Kec. Ciawi" />
+                                </div>
+                            </div>
+                            <div>
+                                <label class="form-label">Nama Kontak Person *</label>
+                                <input id="f-kontak" class="form-input" type="text"
+                                    placeholder="Contoh: Bapak Agus Santoso (Ketua)" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card: Jenis Dokumen -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-icon">📄</div>
+                            <div>
+                                <div class="card-title">Jenis Dokumen</div>
+                                <div style="font-size:11px;color:#64748b;margin-top:2px;">Pilih tipe dokumen yang akan
+                                    dibuat</div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;"
+                                id="doc-type-selector">
+                                <button class="doc-type-btn active" data-type="proposal"
+                                    onclick="selectDocType('proposal', this)">
+                                    <span style="font-size:18px;">📋</span>
+                                    <span>Proposal</span>
+                                </button>
+                                <button class="doc-type-btn" data-type="surat_audiensi"
+                                    onclick="selectDocType('surat_audiensi', this)">
+                                    <span style="font-size:18px;">✉️</span>
+                                    <span>Surat Audiensi</span>
+                                </button>
+                                <button class="doc-type-btn" data-type="press_release"
+                                    onclick="selectDocType('press_release', this)">
+                                    <span style="font-size:18px;">📰</span>
+                                    <span>Press Release</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card: Detail Dokumen (dynamic) -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-icon" id="detail-icon">✏️</div>
+                            <div>
+                                <div class="card-title" id="detail-title">Detail Proposal</div>
+                                <div style="font-size:11px;color:#64748b;margin-top:2px;">Isi informasi yang akan
+                                    diproses AI</div>
+                            </div>
+                        </div>
+                        <div class="card-body" id="dynamic-form-fields"
+                            style="display:flex;flex-direction:column;gap:14px;">
+                            <!-- Filled dynamically -->
+                        </div>
+                    </div>
+
+                    <!-- Judul Dokumen -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-icon">🏷️</div>
+                            <div class="card-title">Judul Dokumen</div>
+                        </div>
+                        <div class="card-body">
+                            <input id="f-judul" class="form-input" type="text"
+                                placeholder="Judul dokumen yang akan dibuat..." />
+                            <p style="font-size:11px;color:#475569;margin-top:8px;">Judul ini digunakan sebagai
+                                referensi dan disimpan ke database.</p>
+                        </div>
+                    </div>
+
+                    <!-- Generate Button -->
+                    <button id="btn-generate" class="btn-primary" onclick="generateDocument()"
+                        style="font-size:15px;padding:14px;">
+                        <span style="font-size:16px;">✨</span>
+                        <span>Buat Dokumen dengan AI</span>
+                    </button>
+
+                </div><!-- END LEFT PANEL -->
+
+                <!-- RIGHT PANEL: A4 Canvas -->
+                <div
+                    style="flex:1; display:flex; flex-direction:column; min-width:0; position:sticky; top:80px; max-height:calc(100vh - 100px);">
+
+                    <!-- Toolbar -->
+                    <div id="canvas-toolbar">
+                        <span class="toolbar-title">📄 Pratinjau Dokumen A4</span>
+                        <div class="toolbar-actions">
+                            <button class="btn-secondary" onclick="copyText()" id="btn-copy">
+                                <span>📋</span> Salin Teks
+                            </button>
+                            <button class="btn-secondary" onclick="printDocument()">
+                                <span>🖨️</span> Cetak / PDF
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Canvas scroll wrapper -->
+                    <div id="canvas-wrapper" style="position:relative;">
+                        <!-- Generating overlay -->
+                        <div id="generating-overlay">
+                            <div class="gen-spinner"></div>
+                            <p style="color:#34d399;font-weight:600;font-size:14px;">Gemini AI sedang menyusun
+                                dokumen...</p>
+                            <p style="color:#64748b;font-size:12px;">Mohon tunggu sebentar</p>
+                        </div>
+
+                        <!-- A4 Canvas -->
+                        <div id="a4-preview-canvas" class="placeholder-state">
+                            <div style="text-align:center;color:#334155;font-family:'Times New Roman',Times,serif;">
+                                <div style="font-size:48px;margin-bottom:16px;opacity:0.4;">📄</div>
+                                <p style="font-size:16px;font-weight:600;color:#475569;margin-bottom:8px;">Pratinjau
+                                    Dokumen</p>
+                                <p style="font-size:14px;color:#64748b;">Isi form di sebelah kiri dan klik<br />"Buat
+                                    Dokumen dengan AI" untuk memulai.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div><!-- END RIGHT PANEL -->
+
+            </div><!-- END SPLIT LAYOUT -->
+        </div><!-- END VIEW WARGA -->
+
+
+        <!-- ==========================================================
+       VIEW: HALAMAN ADMIN
+  ========================================================== -->
+        <div id="view-admin" class="view" style="flex-direction:column;gap:20px;">
+
+            <!-- Section A: API Key Config -->
+            <div class="card fade-in">
+                <div class="card-header">
+                    <div class="card-icon">🔑</div>
+                    <div>
+                        <div class="card-title">Konfigurasi API Key Gemini</div>
+                        <div style="font-size:11px;color:#64748b;margin-top:2px;">Diambil dan disimpan dari tabel <code
+                                style="color:#34d399">sistem_konfigurasi</code></div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div style="display:flex;gap:12px;align-items:flex-end;">
+                        <div style="flex:1;">
+                            <label class="form-label">Gemini API Key</label>
+                            <input id="admin-api-key-input" class="form-input" type="password"
+                                placeholder="Masukkan API Key dari Google AI Studio..." autocomplete="off" />
+                            <p style="font-size:11px;color:#475569;margin-top:6px;">
+                                Dapatkan API Key gratis di <a href="https://aistudio.google.com/apikey" target="_blank"
+                                    style="color:#34d399;">aistudio.google.com</a>
+                            </p>
+                        </div>
+                        <div style="display:flex;flex-direction:column;gap:8px;">
+                            <button class="btn-secondary" onclick="toggleApiKeyVisibility()"
+                                style="height:42px;padding:0 14px;font-size:13px;">
+                                👁️ Tampilkan
+                            </button>
+                        </div>
+                        <div>
+                            <button id="btn-save-key" class="btn-primary" onclick="saveApiKey()"
+                                style="width:auto;padding:11px 22px;white-space:nowrap;">
+                                💾 Simpan Kunci
+                            </button>
+                        </div>
+                    </div>
+                    <div id="current-key-status" style="margin-top:12px;font-size:12px;color:#64748b;">
+                        Memuat status kunci saat ini...
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section B: Document Log Table -->
+            <div class="card fade-in">
+                <div class="card-header" style="justify-content:space-between;">
+                    <div style="display:flex;align-items:center;gap:10px;">
+                        <div class="card-icon">📊</div>
+                        <div>
+                            <div class="card-title">Rekap Dokumen Tersimpan</div>
+                            <div style="font-size:11px;color:#64748b;margin-top:2px;">Semua dokumen dari <code
+                                    style="color:#34d399">dokumen_advokasi</code> JOIN <code
+                                    style="color:#34d399">komunitas_profil</code></div>
+                        </div>
+                    </div>
+                    <button class="btn-secondary" onclick="loadAdminTable()" style="font-size:12px;">
+                        🔄 Refresh
+                    </button>
+                </div>
+                <div class="card-body" style="padding:0;overflow:hidden;">
+                    <div style="overflow-x:auto;">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>Tanggal</th>
+                                    <th>Komunitas</th>
+                                    <th>Wilayah</th>
+                                    <th>Jenis Dokumen</th>
+                                    <th>Judul</th>
+                                    <th style="text-align:center;">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admin-table-body">
+                                <tr>
+                                    <td colspan="6" style="text-align:center;color:#475569;padding:32px 16px;">
+                                        <div style="display:flex;align-items:center;justify-content:center;gap:8px;">
+                                            <div class="spinner"
+                                                style="border-color:rgba(100,116,139,0.3);border-top-color:#64748b;">
+                                            </div>
+                                            Memuat data...
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- Pagination / Count info -->
+                    <div id="table-footer"
+                        style="padding:12px 20px;border-top:1px solid rgba(255,255,255,0.04);font-size:12px;color:#475569;display:flex;justify-content:space-between;align-items:center;">
+                        <span id="table-count">—</span>
+                        <span style="color:#334155;">Diurutkan: Terbaru → Terlama</span>
+                    </div>
+                </div>
+            </div>
+
+        </div><!-- END VIEW ADMIN -->
+
+    </main>
+
+    <!-- ============================================================
+     DOCUMENT TYPE BUTTON STYLE (inline so Tailwind doesn't purge)
+============================================================ -->
+    <style>
+        .doc-type-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 14px 8px;
+            border-radius: 10px;
+            cursor: pointer;
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            background: rgba(15, 23, 42, 0.5);
+            color: #64748b;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .doc-type-btn:hover {
+            border-color: rgba(16, 185, 129, 0.3);
+            color: #94a3b8;
+            background: rgba(16, 185, 129, 0.05);
+        }
+
+        .doc-type-btn.active {
+            background: rgba(16, 185, 129, 0.1);
+            border-color: rgba(16, 185, 129, 0.4);
+            color: #34d399;
+            box-shadow: 0 0 0 1px rgba(16, 185, 129, 0.15) inset;
+        }
+    </style>
+
+    <!-- ============================================================
+     JAVASCRIPT APPLICATION LOGIC
+============================================================ -->
+    <script>
+        // ================================================================
+        // 0. GLOBALS & SUPABASE INIT
+        // ================================================================
+        const SUPABASE_URL = "https://zgkufyjodvbtnsjyruur.supabase.co";
+        const SUPABASE_KEY = "sb_publishable_ChsfCLvoBGCQI4EACyXFKg_GGrCuA9U";
+
+        let supabaseClient;
+        let cachedApiKey = null;
+        let currentDocType = 'proposal';
+
+        try {
+            supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        } catch (e) {
+            console.error("Supabase init failed:", e);
+        }
+
+        // ================================================================
+        // 1. TOAST NOTIFICATIONS
+        // ================================================================
+        function showToast(message, type = 'info', duration = 4000) {
+            const icons = { success: '✅', error: '❌', info: 'ℹ️' };
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `<span style="font-size:16px;">${icons[type]}</span><span>${message}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.transition = 'all 0.3s ease';
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(10px)';
+                setTimeout(() => toast.remove(), 300);
+            }, duration);
+        }
+
+        // ================================================================
+        // 2. VIEW SWITCHING
+        // ================================================================
+        function switchView(view) {
+            document.getElementById('view-warga').classList.toggle('active', view === 'warga');
+            document.getElementById('view-admin').classList.toggle('active', view === 'admin');
+            document.getElementById('tab-warga').classList.toggle('active', view === 'warga');
+            document.getElementById('tab-admin').classList.toggle('active', view === 'admin');
+
+            if (view === 'admin') {
+                loadAdminTable();
+                loadCurrentKeyStatus();
+            }
+        }
+
+        // ================================================================
+        // 3. API KEY MANAGEMENT
+        // ================================================================
+        async function fetchAndCacheApiKey() {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('sistem_konfigurasi')
+                    .select('gemini_api_key')
+                    .eq('id', 'gemini_config')
+                    .single();
+
+                if (error) throw error;
+
+                const key = data?.gemini_api_key;
+                const statusEl = document.getElementById('api-status');
+                const alertEl = document.getElementById('api-missing-alert');
+
+                if (!key || key === 'KOSONG' || key.trim() === '') {
+                    cachedApiKey = null;
+                    statusEl.innerHTML = `<div style="width:8px;height:8px;border-radius:50%;background:#f59e0b;"></div><span>API Key Belum Diset</span>`;
+                    alertEl.style.display = 'block';
+                } else {
+                    cachedApiKey = key.trim();
+                    statusEl.innerHTML = `<div class="pulse-dot"></div><span style="color:#34d399;">AI Siap</span>`;
+                    alertEl.style.display = 'none';
+                }
+            } catch (e) {
+                console.error("Fetch API key error:", e);
+                const statusEl = document.getElementById('api-status');
+                statusEl.innerHTML = `<div style="width:8px;height:8px;border-radius:50%;background:#ef4444;"></div><span style="color:#fca5a5;">Koneksi DB Error</span>`;
+                showToast('Gagal terhubung ke database. Periksa koneksi internet.', 'error');
+            }
+        }
+
+        async function loadCurrentKeyStatus() {
+            const statusEl = document.getElementById('current-key-status');
+            try {
+                const { data, error } = await supabaseClient
+                    .from('sistem_konfigurasi')
+                    .select('gemini_api_key, updated_at')
+                    .eq('id', 'gemini_config')
+                    .single();
+
+                if (error || !data) {
+                    statusEl.innerHTML = `<span style="color:#f59e0b;">⚠️ Record konfigurasi belum ada di database.</span>`;
+                    return;
+                }
+
+                const key = data.gemini_api_key;
+                const updatedAt = data.updated_at ? new Date(data.updated_at).toLocaleString('id-ID') : '-';
+
+                if (!key || key === 'KOSONG' || key.trim() === '') {
+                    statusEl.innerHTML = `<span style="color:#f59e0b;">⚠️ API Key belum diset (nilai: KOSONG). Terakhir diperbarui: ${updatedAt}</span>`;
+                } else {
+                    const masked = key.substring(0, 6) + '••••••••••••' + key.substring(key.length - 4);
+                    statusEl.innerHTML = `<span style="color:#34d399;">✅ Kunci aktif: <code style="background:rgba(16,185,129,0.1);padding:2px 8px;border-radius:4px;">${masked}</code> &nbsp;|&nbsp; Diperbarui: ${updatedAt}</span>`;
+                }
+            } catch (e) {
+                statusEl.innerHTML = `<span style="color:#ef4444;">❌ Gagal memuat status kunci.</span>`;
+            }
+        }
+
+        async function saveApiKey() {
+            const inputEl = document.getElementById('admin-api-key-input');
+            const btnEl = document.getElementById('btn-save-key');
+            const newKey = inputEl.value.trim();
+
+            if (!newKey) {
+                showToast('API Key tidak boleh kosong.', 'error');
+                return;
+            }
+
+            btnEl.disabled = true;
+            btnEl.innerHTML = `<div class="spinner"></div> Menyimpan...`;
+
+            try {
+                const { error } = await supabaseClient
+                    .from('sistem_konfigurasi')
+                    .upsert({ id: 'gemini_config', gemini_api_key: newKey, updated_at: new Date().toISOString() }, { onConflict: 'id' });
+
+                if (error) throw error;
+
+                showToast('API Key berhasil disimpan!', 'success');
+                inputEl.value = '';
+                await fetchAndCacheApiKey();
+                await loadCurrentKeyStatus();
+            } catch (e) {
+                console.error("Save API key error:", e);
+                showToast(`Gagal menyimpan: ${e.message || 'Error tidak diketahui'}`, 'error');
+            } finally {
+                btnEl.disabled = false;
+                btnEl.innerHTML = `💾 Simpan Kunci`;
+            }
+        }
+
+        function toggleApiKeyVisibility() {
+            const inp = document.getElementById('admin-api-key-input');
+            inp.type = inp.type === 'password' ? 'text' : 'password';
+        }
+
+        // ================================================================
+        // 4. DOCUMENT TYPE SELECTION & DYNAMIC FORM
+        // ================================================================
+        const DOC_FORMS = {
+            proposal: {
+                icon: '📋',
+                title: 'Detail Proposal',
+                fields: [
+                    { id: 'f-tujuan-proposal', label: 'Tujuan / Maksud Proposal *', type: 'textarea', placeholder: 'Jelaskan tujuan utama proposal ini, apa yang ingin dicapai...' },
+                    { id: 'f-program-kegiatan', label: 'Program & Rencana Kegiatan *', type: 'textarea', placeholder: 'Uraikan program atau kegiatan yang direncanakan...' },
+                    { id: 'f-latar-belakang', label: 'Latar Belakang Masalah *', type: 'textarea', placeholder: 'Jelaskan kondisi saat ini dan permasalahan yang melatarbelakangi...' },
+                    { id: 'f-anggaran', label: 'Estimasi Anggaran (Rp)', type: 'text', placeholder: 'Contoh: Rp 25.000.000 (dua puluh lima juta rupiah)' },
+                ]
+            },
+            surat_audiensi: {
+                icon: '✉️',
+                title: 'Detail Surat Audiensi',
+                fields: [
+                    { id: 'f-pejabat', label: 'Nama Pejabat yang Dituju *', type: 'text', placeholder: 'Contoh: Kepala Dinas Sosial Kabupaten ...' },
+                    { id: 'f-instansi', label: 'Nama Instansi / Lembaga Tujuan *', type: 'text', placeholder: 'Contoh: Dinas Sosial Kabupaten Bogor' },
+                    { id: 'f-tujuan-audiensi', label: 'Tujuan Audiensi *', type: 'textarea', placeholder: 'Jelaskan maksud dan tujuan permohonan audiensi...' },
+                    { id: 'f-isi-permintaan', label: 'Isi / Pokok Permasalahan *', type: 'textarea', placeholder: 'Uraikan permasalahan atau aspirasi yang ingin disampaikan...' },
+                ]
+            },
+            press_release: {
+                icon: '📰',
+                title: 'Detail Press Release',
+                fields: [
+                    { id: 'f-judul-berita', label: 'Judul / Topik Berita *', type: 'text', placeholder: 'Contoh: Peluncuran Program Pemberdayaan Ekonomi Warga Desa ...' },
+                    { id: 'f-isi-berita', label: 'Isi Utama Berita *', type: 'textarea', placeholder: 'Jelaskan peristiwa, kegiatan, atau isu yang akan diberitakan...' },
+                    { id: 'f-kutipan', label: 'Kutipan Narasumber', type: 'textarea', placeholder: 'Masukkan kutipan langsung dari narasumber (opsional)...' },
+                    { id: 'f-cta', label: 'Call to Action / Penutup', type: 'textarea', placeholder: 'Apa yang diharapkan dari pembaca atau publik setelah membaca ini...' },
+                ]
+            }
+        };
+
+        function selectDocType(type, btn) {
+            currentDocType = type;
+            document.querySelectorAll('.doc-type-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            const config = DOC_FORMS[type];
+            document.getElementById('detail-icon').textContent = config.icon;
+            document.getElementById('detail-title').textContent = config.title;
+
+            const container = document.getElementById('dynamic-form-fields');
+            container.innerHTML = '';
+
+            config.fields.forEach(f => {
+                const wrapper = document.createElement('div');
+                const label = `<label class="form-label" for="${f.id}">${f.label}</label>`;
+                let input;
+                if (f.type === 'textarea') {
+                    input = `<textarea id="${f.id}" class="form-textarea" placeholder="${f.placeholder}"></textarea>`;
+                } else {
+                    input = `<input id="${f.id}" class="form-input" type="${f.type}" placeholder="${f.placeholder}" />`;
+                }
+                wrapper.innerHTML = label + input;
+                container.appendChild(wrapper);
+            });
+        }
+
+        // ================================================================
+        // 5. BUILD PROMPT FROM FORM DATA
+        // ================================================================
+        function buildPrompt() {
+            const komunitas = document.getElementById('f-nama-komunitas').value.trim();
+            const jenis = document.getElementById('f-jenis-komunitas').value.trim();
+            const wilayah = document.getElementById('f-wilayah').value.trim();
+            const kontak = document.getElementById('f-kontak').value.trim();
+
+            let inputLines = [];
+            inputLines.push(`Nama Komunitas: ${komunitas}`);
+            inputLines.push(`Jenis Komunitas: ${jenis}`);
+            inputLines.push(`Wilayah: ${wilayah}`);
+            inputLines.push(`Kontak Person: ${kontak}`);
+
+            const config = DOC_FORMS[currentDocType];
+            config.fields.forEach(f => {
+                const el = document.getElementById(f.id);
+                if (el && el.value.trim()) {
+                    const cleanLabel = f.label.replace(' *', '');
+                    inputLines.push(`${cleanLabel}: ${el.value.trim()}`);
+                }
+            });
+
+            const jenisPretty = {
+                proposal: 'Proposal Kegiatan Komunitas',
+                surat_audiensi: 'Surat Permohonan Audiensi Resmi',
+                press_release: 'Siaran Pers (Press Release)'
+            }[currentDocType];
+
+            return { jenis: jenisPretty, input: inputLines.join('\n') };
+        }
+
+        // ================================================================
+        // 6. GENERATE DOCUMENT WITH GEMINI AI
+        // ================================================================
+        async function generateDocument() {
+            if (!cachedApiKey) {
+                showToast('Admin harus mengisi API Key Gemini di Halaman Admin dahulu.', 'error', 6000);
+                document.getElementById('api-missing-alert').style.display = 'block';
+                document.getElementById('api-missing-alert').scrollIntoView({ behavior: 'smooth', block: 'center' });
+                return;
+            }
+
+            // Basic validation
+            const komunitas = document.getElementById('f-nama-komunitas').value.trim();
+            const wilayah = document.getElementById('f-wilayah').value.trim();
+            const judul = document.getElementById('f-judul').value.trim();
+
+            if (!komunitas || !wilayah) {
+                showToast('Mohon isi minimal Nama Komunitas dan Wilayah terlebih dahulu.', 'error');
+                return;
+            }
+
+            const btn = document.getElementById('btn-generate');
+            const overlay = document.getElementById('generating-overlay');
+            const canvas = document.getElementById('a4-preview-canvas');
+
+            btn.disabled = true;
+            btn.innerHTML = `<div class="spinner"></div> <span>Sedang Membuat Dokumen...</span>`;
+            overlay.classList.add('show');
+            canvas.classList.remove('placeholder-state', 'doc-type-proposal', 'doc-type-surat_audiensi', 'doc-type-press_release');
+            canvas.classList.add('doc-type-' + currentDocType);
+
+            try {
+                const { jenis: jenisDokumen, input: inputMentah } = buildPrompt();
+                const jenis = jenisDokumen; // Keep alias for saveDocument compatibility
+
+                const apiKey = cachedApiKey;
+                const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+
+                // ── SYSTEM PROMPT & USER PROMPT: Logika Kondisional ────────────────────
+                let SYSTEM_INSTRUCTION = '';
+                let USER_PROMPT = '';
+
+                if (currentDocType === 'surat_audiensi') {
+                    SYSTEM_INSTRUCTION = `Kamu adalah Pakar Administrasi Publik & Birokrasi Pemerintahan tingkat senior.
+
+ATURAN WAJIB OUTPUT:
+1. Keluarkan HANYA teks HTML/Markdown sesuai kerangka di bawah ini mulai dari baris pertama. DILARANG menambahkan kata pembuka/penutup kasual.
+2. Wajib gunakan persis struktur HTML statis berikut untuk surat audiensi, kamu HANYA PERLU MENGISI teks/datanya saja:
+
+<div style="text-align: center; border-bottom: 3px solid black; padding-bottom: 10px; margin-bottom: 20px; line-height: 1.2;">
+    <h2 style="margin:0; text-transform: uppercase;">[NAMA ORGANISASI]</h2>
+    <p style="margin:0; font-size: 14px;">[Alamat Lengkap Sekretariat, Email, dan No. Telp]</p>
+</div>
+<table style="width: 100%; border: none; margin-bottom: 15px;">
+    <tr>
+        <td style="width: 60%; border: none; vertical-align: top; padding: 0;">
+            Nomor &nbsp;&nbsp;&nbsp;&nbsp;: [Nomor Surat]<br>
+            Lampiran : [Jumlah Lampiran]<br>
+            Perihal &nbsp;&nbsp;&nbsp;: <b>[Perihal Surat]</b>
+        </td>
+        <td style="width: 40%; border: none; text-align: right; vertical-align: top; padding: 0;">
+            [Tempat, Tanggal Surat]
+        </td>
+    </tr>
+</table>
+<div style="margin-bottom: 15px;">
+    Kepada Yth.,<br><b>[Nama/Jabatan Tujuan]</b><br>di - Tempat
+</div>
+<p style="text-align: justify; text-indent: 30px; margin-bottom: 10px;">[Salam pembuka, Paragraf pengantar audiensi yang menjelaskan konteks dan urgensi secara meyakinkan]</p>
+<table style="width: 100%; border: none; margin-left: 30px; border-collapse: collapse;">
+    <tr>
+        <td style="width: 120px; border: none; padding: 2px 0; vertical-align: top;">Hari/Tanggal</td>
+        <td style="width: 15px; border: none; padding: 2px 0; vertical-align: top;">:</td>
+        <td style="border: none; padding: 2px 0; vertical-align: top; text-align: left;">[Isi]</td>
+    </tr>
+    <tr>
+        <td style="border: none; padding: 2px 0; vertical-align: top;">Waktu</td>
+        <td style="border: none; padding: 2px 0; vertical-align: top;">:</td>
+        <td style="border: none; padding: 2px 0; vertical-align: top; text-align: left;">[Isi]</td>
+    </tr>
+    <tr>
+        <td style="border: none; padding: 2px 0; vertical-align: top;">Tempat</td>
+        <td style="border: none; padding: 2px 0; vertical-align: top;">:</td>
+        <td style="border: none; padding: 2px 0; vertical-align: top; text-align: left;">[Isi]</td>
+    </tr>
+</table>
+<p style="text-align: justify; text-indent: 30px; margin-bottom: 30px;">[Paragraf penutup yang formal, menyampaikan harapan dan ucapan terima kasih]</p>
+<table style="width: 100%; border: none; text-align: center; page-break-inside: avoid; break-inside: avoid;">
+    <tr>
+        <td style="border: none; width: 50%;">Mengetahui,<br><b>Ketua Umum</b><br><br><br><br><b>([Nama Terang])</b></td>
+        <td style="border: none; width: 50%;"> <br><b>Sekretaris</b><br><br><br><br><b>([Nama Terang])</b></td>
+    </tr>
+</table>
+
+3. Jangan ubah struktur HTML-nya, hanya ganti teks di dalam tanda kurung siku [...] dengan data yang relevan dan elaboratif.`;
+
+                    USER_PROMPT = `JENIS DOKUMEN YANG DIMINTA: ${jenisDokumen}
+
+DATA KOMUNITAS & KONTEKS:
+${inputMentah}
+
+INSTRUKSI TAMBAHAN:
+- Tulis surat permohonan audiensi ini selengkap dan sesopan mungkin.
+- Elaborasi poin tujuan audiensi agar instansi yang dituju merasa hal ini penting dan mendesak.
+- Berikan usulan tanggal dan waktu secara spesifik.`;
+
+                } else if (currentDocType === 'press_release') {
+                    SYSTEM_INSTRUCTION = `Kamu adalah Pakar Hubungan Masyarakat (Humas) & Jurnalis Senior.
+
+ATURAN WAJIB OUTPUT:
+1. Keluarkan HANYA teks HTML/Markdown sesuai kerangka di bawah ini mulai dari baris pertama. DILARANG menambahkan kata pembuka/penutup kasual.
+2. Wajib gunakan persis struktur HTML statis berikut untuk Press Release, kamu HANYA PERLU MENGISI teks/datanya saja:
+
+<div style="text-align: center; border-bottom: 2px solid black; margin-bottom: 20px;">
+    <h2 style="margin:0; text-transform: uppercase;">[NAMA INSTITUSI/ORGANISASI]</h2>
+    <p style="margin:5px 0; font-size: 12px;">[Alamat, Telp, Email, dan Laman Web Resmi]</p>
+</div>
+<h1 style="text-align: center; color: #333; text-decoration: underline;">PRESS RELEASE</h1>
+<h2 style="text-align: center; margin: 10px 0;">[JUDUL KEGIATAN/ISU UTAMA]</h2>
+<p style="text-align: center; font-style: italic; margin-bottom: 20px;">[Lokasi, Tanggal]</p>
+<div style="text-align: justify; line-height: 1.6;">
+    [Paragraf 1 (Lead: memuat 5W+1H)]<br><br>
+    [Paragraf 2 (Detail kegiatan/data pendukung)]<br><br>
+    [Paragraf 3 (Kutipan/Quotes dari tokoh/pejabat)]<br><br>
+    [Paragraf 4 (Penutup/harapan)]
+</div>
+<div style="margin-top: 40px; border-top: 1px solid #ccc; padding-top: 10px;">
+    <b>Media Contact:</b><br>
+    Email: [Email]<br>
+    Website: [Website/Social Media]
+</div>
+
+3. Jangan ubah struktur HTML-nya, hanya ganti teks di dalam tanda kurung siku [...] dengan data yang relevan dan elaboratif.
+4. DILARANG menggunakan struktur BAB (BAB I, BAB II).`;
+
+                    USER_PROMPT = `JENIS DOKUMEN YANG DIMINTA: ${jenisDokumen}
+
+DATA KOMUNITAS & KONTEKS:
+${inputMentah}
+
+INSTRUKSI TAMBAHAN:
+- Buat rilis pers ini menjadi sebuah berita yang layak muat (newsworthy).
+- Buat narasinya menggugah dan menunjukkan bahwa inisiatif komunitas ini berdampak besar.
+- Pastikan kutipan (quotes) terasa natural namun memiliki pesan kunci yang kuat.`;
+
+                } else {
+                    // Default / Proposal
+                    SYSTEM_INSTRUCTION = `Kamu adalah Pakar Administrasi Publik & Advokasi Komunitas Indonesia tingkat senior, berpengalaman lebih dari 20 tahun dalam menyusun dokumen formal, proposal hibah pemerintah, surat keputusan, dan naskah dinas tingkat kabupaten hingga kementerian.
+
+ATURAN WAJIB OUTPUT:
+1. Keluarkan HANYA teks Markdown murni mulai dari baris pertama. DILARANG menambahkan kata pembuka seperti "Baik", "Tentu", "Berikut adalah", atau kalimat penutup kasual apapun.
+2. Gunakan bahasa Indonesia formal, baku, dan legalistik sesuai EYD terbaru serta Permendagri tentang tata naskah dinas.
+3. Wajib gunakan struktur BAB dengan format heading Markdown:
+   - # (H1) = Judul utama dokumen (satu kali, HURUF KAPITAL SEMUA)
+   - ## (H2) = BAB I, BAB II, BAB III, dst.
+   - ### (H3) = Sub-bab bernomor (1.1, 1.2, 2.1, dst.)
+   - #### (H4) = Sub-sub-bab jika diperlukan (1.1.1, 1.1.2)
+4. Setiap BAB dan sub-bab harus berisi narasi paragraf yang panjang, elaboratif, dan substantif (BUKAN ringkasan bullet point semata). Minimum 3-5 paragraf per sub-bab utama.
+5. Wajib sertakan bagian-bagian berikut dalam SETIAP jenis dokumen:
+   a. **Latar Belakang** – narasi panjang menjelaskan konteks sosial, kondisi faktual lapangan, dan urgensi permasalahan.
+   b. **Dasar Hukum** – minimal 5 regulasi yang relevan (UU, PP, Permendagri, Perda) disusun sebagai daftar bernomor.
+   c. **Tujuan & Sasaran** – uraian terpisah antara tujuan umum dan tujuan khusus.
+   d. **Rencana Anggaran Biaya (RAB)** – wajib format Tabel Markdown valid dengan kolom: No | Komponen Kegiatan | Volume | Satuan | Harga Satuan (Rp) | Jumlah (Rp). Sertakan minimal 8 baris item anggaran yang realistis dan baris TOTAL di akhir.
+   e. **Matriks Implementasi Kegiatan** – wajib format Tabel Markdown valid dengan kolom: No | Kegiatan | Penanggung Jawab | Waktu Pelaksanaan | Output/Hasil | Indikator Keberhasilan.
+   f. **BAB PENUTUP** – Dokumen WAJIB diakhiri dengan satu BAB PENUTUP yang berdiri sendiri sebagai ## BAB terakhir. Bagian ini harus memuat:
+      - **Kesimpulan**: ringkasan singkat atas seluruh isi dokumen, kondisi yang mendorong dibuatnya dokumen, dan relevansinya bagi masyarakat/komunitas.
+      - **Harapan Pelaksanaan**: narasi harapan yang formal dan optimis mengenai dampak pelaksanaan kegiatan/program bagi komunitas dan wilayah.
+      - **Ucapan Terima Kasih**: paragraf penutup formal berisi apresiasi dan ucapan terima kasih kepada semua pihak yang terlibat, permohonan dukungan, serta tanda tangan/tempat-tanggal pembuatan dokumen.
+6. Untuk Tabel Markdown: gunakan format GFM table standar dengan baris pemisah header (| --- |). Pastikan setiap sel terisi dan tidak ada sel kosong.
+7. Dokumen harus PANJANG dan KOMPREHENSIF – target minimal 1500 kata output Markdown.
+8. DILARANG menggunakan placeholder seperti [isi di sini] atau [sebutkan].`;
+
+                    USER_PROMPT = `JENIS DOKUMEN YANG DIMINTA: ${jenisDokumen}
+
+DATA KOMUNITAS & KONTEKS:
+${inputMentah}
+
+INSTRUKSI TAMBAHAN:
+- Buat dokumen ini selengkap, sedetail, dan sekomprehensif mungkin sebagai dokumen administrasi publik tingkat profesional.
+- Kembangkan setiap informasi dari data di atas menjadi narasi yang kaya, elaboratif, dan berbobot.
+- Susun Rencana Anggaran Biaya (RAB) dalam bentuk tabel yang realistis berdasarkan konteks yang diberikan.
+- Susun Matriks Implementasi Kegiatan dalam bentuk tabel yang mendetail.
+- Sertakan referensi regulasi / dasar hukum yang sesuai secara logis dengan jenis kegiatan dan wilayah.
+- Gunakan gaya penulisan naskah dinas yang berwibawa, terstruktur, dan meyakinkan.`;
+                }
+
+                const payload = {
+                  "contents": [
+                    {
+                      "parts": [
+                        { "text": USER_PROMPT }
+                      ]
+                    }
+                  ],
+                  "systemInstruction": {
+                    "parts": [
+                      { "text": SYSTEM_INSTRUCTION }
+                    ]
+                  },
+                  "generationConfig": {
+                    "temperature": 0.25,
+                    "maxOutputTokens": 8192
+                  }
+                };
+
+                const response = await fetch(endpoint, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    const errData = await response.json().catch(() => ({}));
+                    throw new Error(errData?.error?.message || `HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                const data = await response.json();
+                const markdownText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+
+                if (!markdownText) throw new Error('Respons AI kosong atau tidak valid.');
+
+                // Render Markdown to A4 canvas
+                canvas.innerHTML = marked.parse(markdownText);
+                canvas.classList.remove('placeholder-state');
+
+                // Save to Supabase
+                await saveDocument(markdownText, jenis, judul || `Dokumen ${jenis} - ${komunitas}`);
+
+                showToast('Dokumen berhasil dibuat dan disimpan!', 'success');
+
+            } catch (e) {
+                console.error("Generation error:", e);
+                canvas.innerHTML = `
+      <div style="text-align:center;padding:40px;font-family:'Times New Roman',Times,serif;color:#dc2626;">
+        <div style="font-size:40px;margin-bottom:16px;">⚠️</div>
+        <h3 style="font-size:16px;margin-bottom:8px;color:#dc2626;">Gagal Membuat Dokumen</h3>
+        <p style="font-size:14px;color:#6b7280;">${e.message || 'Terjadi kesalahan tidak diketahui.'}</p>
+        <p style="font-size:13px;color:#9ca3af;margin-top:8px;">Periksa API Key dan koneksi internet, lalu coba lagi.</p>
+      </div>`;
+                canvas.classList.remove('placeholder-state');
+                showToast(`Error: ${e.message}`, 'error', 6000);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = `<span style="font-size:16px;">✨</span> <span>Buat Dokumen dengan AI</span>`;
+                overlay.classList.remove('show');
+            }
+        }
+
+        // ================================================================
+        // 7. SAVE DOCUMENT TO SUPABASE
+        // ================================================================
+        async function saveDocument(outputText, jenisDokumen, judulDokumen) {
+            try {
+                const komunitas = document.getElementById('f-nama-komunitas').value.trim();
+                const jenisKomunitas = document.getElementById('f-jenis-komunitas').value.trim();
+                const wilayah = document.getElementById('f-wilayah').value.trim();
+                const kontak = document.getElementById('f-kontak').value.trim();
+
+                // Upsert community profile
+                const { data: profil, error: profilError } = await supabaseClient
+                    .from('komunitas_profil')
+                    .upsert({
+                        nama_komunitas: komunitas,
+                        jenis_komunitas: jenisKomunitas,
+                        wilayah_desa: wilayah,
+                        kontak_person: kontak,
+                    }, { onConflict: 'nama_komunitas' })
+                    .select('id')
+                    .single();
+
+                if (profilError) {
+                    console.warn('Profil upsert warning:', profilError);
+                }
+
+                const komunitasId = profil?.id || null;
+
+                // Build raw input summary
+                const { input } = buildPrompt();
+
+                // Insert document log
+                const { error: docError } = await supabaseClient
+                    .from('dokumen_advokasi')
+                    .insert({
+                        komunitas_id: komunitasId,
+                        jenis_dokumen: currentDocType,
+                        judul_dokumen: judulDokumen,
+                        input_mentah: input,
+                        output_text: outputText,
+                        created_at: new Date().toISOString()
+                    });
+
+                if (docError) {
+                    console.warn('Doc insert warning:', docError);
+                }
+
+            } catch (e) {
+                console.warn('Save to DB warning (non-blocking):', e);
+            }
+        }
+
+        // ================================================================
+        // 8. ADMIN TABLE LOAD
+        // ================================================================
+        async function loadAdminTable() {
+            const tbody = document.getElementById('admin-table-body');
+            const countEl = document.getElementById('table-count');
+
+            tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:#475569;padding:32px 16px;">
+    <div style="display:flex;align-items:center;justify-content:center;gap:8px;">
+      <div class="spinner" style="border-color:rgba(100,116,139,0.3);border-top-color:#64748b;"></div>
+      Memuat data...
+    </div>
+  </td></tr>`;
+
+            try {
+                const { data, error } = await supabaseClient
+                    .from('dokumen_advokasi')
+                    .select(`
+        id, jenis_dokumen, judul_dokumen, output_text, created_at,
+        komunitas_profil ( nama_komunitas, wilayah_desa )
+      `)
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+
+                if (!data || data.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:#475569;padding:40px;">
+        <div style="font-size:28px;margin-bottom:10px;">📭</div>
+        Belum ada dokumen yang tersimpan.
+      </td></tr>`;
+                    countEl.textContent = '0 dokumen';
+                    return;
+                }
+
+                countEl.textContent = `${data.length} dokumen`;
+
+                const badgeMap = {
+                    proposal: 'badge-proposal',
+                    surat_audiensi: 'badge-surat',
+                    press_release: 'badge-press'
+                };
+                const labelMap = {
+                    proposal: '📋 Proposal',
+                    surat_audiensi: '✉️ Surat Audiensi',
+                    press_release: '📰 Press Release'
+                };
+
+                tbody.innerHTML = data.map(row => {
+                    const tanggal = row.created_at
+                        ? new Date(row.created_at).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' })
+                        : '-';
+                    const waktu = row.created_at
+                        ? new Date(row.created_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })
+                        : '';
+                    const namaOrg = row.komunitas_profil?.nama_komunitas || '—';
+                    const wilayah = row.komunitas_profil?.wilayah_desa || '—';
+                    const jenis = row.jenis_dokumen || 'unknown';
+                    const badgeClass = badgeMap[jenis] || 'badge-proposal';
+                    const badgeLabel = labelMap[jenis] || jenis;
+                    const judul = row.judul_dokumen || '—';
+                    const docId = row.id;
+                    const outputEncoded = encodeURIComponent(row.output_text || '');
+
+                    return `<tr>
+        <td>
+          <div style="font-size:13px;font-weight:500;color:#e2e8f0;">${tanggal}</div>
+          <div style="font-size:11px;color:#475569;">${waktu}</div>
+        </td>
+        <td>
+          <div style="font-size:13px;font-weight:500;color:#e2e8f0;">${escapeHtml(namaOrg)}</div>
+        </td>
+        <td style="font-size:12px;color:#64748b;">${escapeHtml(wilayah)}</td>
+        <td><span class="badge ${badgeClass}">${badgeLabel}</span></td>
+        <td style="max-width:220px;">
+          <div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:13px;color:#cbd5e1;" title="${escapeHtml(judul)}">
+            ${escapeHtml(judul)}
+          </div>
+        </td>
+        <td style="text-align:center;">
+          <button class="btn-sm btn-view" onclick="viewHistoricalDoc('${docId}', decodeURIComponent('${outputEncoded}'))">
+            👁️ Lihat
+          </button>
+        </td>
+      </tr>`;
+                }).join('');
+
+            } catch (e) {
+                console.error('Load admin table error:', e);
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:#fca5a5;padding:32px;">
+      ❌ Gagal memuat data: ${e.message}
+    </td></tr>`;
+                countEl.textContent = 'Error';
+            }
+        }
+
+        function viewHistoricalDoc(id, outputText) {
+            if (!outputText) {
+                showToast('Isi dokumen tidak ditemukan.', 'error');
+                return;
+            }
+
+            // Switch to warga view to show canvas
+            switchView('warga');
+
+            const canvas = document.getElementById('a4-preview-canvas');
+            canvas.classList.remove('placeholder-state');
+            canvas.innerHTML = marked.parse(outputText);
+
+            showToast('Dokumen historis dimuat ke pratinjau.', 'info');
+
+            // Scroll to canvas
+            setTimeout(() => {
+                document.getElementById('canvas-wrapper').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 200);
+        }
+
+        // ================================================================
+        // 9. COPY & PRINT
+        // ================================================================
+        function copyText() {
+            const canvas = document.getElementById('a4-preview-canvas');
+            const text = canvas.innerText;
+
+            if (!text.trim() || canvas.classList.contains('placeholder-state')) {
+                showToast('Belum ada konten untuk disalin.', 'error');
+                return;
+            }
+
+            navigator.clipboard.writeText(text).then(() => {
+                const btn = document.getElementById('btn-copy');
+                const orig = btn.innerHTML;
+                btn.innerHTML = `✅ Tersalin!`;
+                showToast('Teks berhasil disalin ke clipboard.', 'success');
+                setTimeout(() => { btn.innerHTML = orig; }, 2000);
+            }).catch(() => {
+                showToast('Gagal menyalin teks. Coba lagi.', 'error');
+            });
+        }
+
+        function printDocument() {
+            const canvas = document.getElementById('a4-preview-canvas');
+            if (canvas.classList.contains('placeholder-state') || !canvas.innerHTML.trim()) {
+                showToast('Tidak ada dokumen untuk dicetak.', 'error');
+                return;
+            }
+
+            window.print();
+        }
+
+        // ================================================================
+        // 10. UTILITY
+        // ================================================================
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+
+        // ================================================================
+        // 11. APPLICATION INITIALIZATION
+        // ================================================================
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Initialize default doc type form
+            selectDocType('proposal', document.querySelector('.doc-type-btn[data-type="proposal"]'));
+
+            // Fetch and cache API key on load
+            await fetchAndCacheApiKey();
+        });
+    </script>
+
+</body>
+
+</html>
