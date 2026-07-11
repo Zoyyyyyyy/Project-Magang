@@ -113,6 +113,38 @@ create table admin_accounts (
 insert into admin_accounts (username, password) 
 values ('kaderposyandu', 'posyandu2026');
 ```
+
+## 🕹️ Alur Penggunaan & Demo Aplikasi
+
+Untuk mempermudah pengujian, berikut adalah alur kerja (workflow) penggunaan Web Posyandu dari sisi Pengguna (Orang Tua) dan Admin (Kader):
+
+### 👥 1. Sisi Pengguna (Orang Tua / Umum)
+1. **Akses Landing Page:** Pengguna membuka website dan dapat melihat informasi layanan Posyandu digital yang tersedia.
+2. **Pendaftaran Anak:**
+   - Masuk ke menu **Daftar Anak**.
+   - Isi data identitas anak secara lengkap (Nama, Tanggal Lahir, Jenis Kelamin, Nama Ibu, No. WhatsApp, serta BB & TB Awal).
+   - Klik Simpan. Data akan otomatis masuk ke tabel `anak` di Supabase secara *real-time*.
+3. **Scan Nutrisi Makanan (AI):**
+   - Masuk ke menu **Scan Gizi Makanan**.
+   - Pilih nama anak yang sudah terdaftar sebelumnya pada kolom *dropdown*.
+   - *Upload* atau ambil foto makanan harian anak.
+   - Klik proses, dan sistem (via Gemini API) akan langsung menampilkan analisis detail mengenai kandungan nutrisi makanan tersebut. Riwayat scan ini otomatis tercatat di tabel `harian_nutrisi`.
+
+### 🔐 2. Sisi Admin (Kader Posyandu)
+1. **Login Kader:**
+   - Masuk ke halaman khusus admin.
+   - Masukkan *Username* dan *Password* yang terdaftar pada tabel `admin_accounts` di database.
+2. **Dashboard Ringkasan:** Setelah sukses login, kader disuguhkan ringkasan berupa:
+   - Total anak yang terdaftar di sistem.
+   - Total akumulasi scan nutrisi AI yang telah dilakukan oleh user.
+   - Status keaktifan sistem AI serta kolom input untuk memperbarui API Key Gemini secara dinamis.
+3. **Pencatatan Posyandu Bulanan:**
+   - Masuk ke menu **Catatan Bulanan**.
+   - Pilih nama anak dari *dropdown* data yang terintegrasi.
+   - Input hasil pemeriksaan fisik berkala (Berat Badan, Tinggi Badan, Lingkar Kepala, Bulan Ke-, serta Catatan Tambahan Khusus). Data akan tersimpan di tabel `timbangan_bulanan`.
+4. **Monitoring Log Nutrisi:**
+   - Kader dapat membuka menu **Log Nutrisi AI** untuk melihat rekapitulasi makanan apa saja yang dikonsumsi oleh anak sehari-hari berdasarkan foto yang di-scan oleh orang tua. Ini mempermudah kader dalam memberikan evaluasi gizi yang tepat sasaran.
+
 ## 🚀 Cara Menjalankan Lokal
 1. Clone Repository
 ```
