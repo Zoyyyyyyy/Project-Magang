@@ -145,7 +145,11 @@ project-posyandu/
         ├── data_anak.png
         ├── log_nutrisi_ai.png
         └── scan_ai.png
-```        
+```
+---
+
+<div align="center">
 Dibuat dengan ❤️ untuk kemajuan Kesehatan Anak Indonesia
 
 ⭐ Beri bintang pada repository ini jika bermanfaat!
+</div>
