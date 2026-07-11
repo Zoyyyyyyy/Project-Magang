@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sipadu-(Sistem Pelayanan Posyandu)</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="src/styles.css">
+</head>
+
+<body class="bg-slate-50 text-slate-800 font-sans antialiased leading-relaxed">
+
+    <!-- NAVIGASI UTAMA -->
+    <nav class="bg-emerald-700 text-white shadow-sm sticky top-0 z-40" role="navigation" aria-label="Menu utama">
+        <div class="max-w-5xl mx-auto px-5 py-4 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
+            <!-- Diubah agar kembali ke Landing Page saat logo diklik -->
+            <button type="button" onclick="switchView('view-landing')"
+                class="text-left font-bold text-lg tracking-tight hover:opacity-90 transition cursor-pointer">
+                SIPADU-Sistem Pelayanan Posyandu
+            </button>
+            <div class="flex flex-wrap gap-2">
+                <button type="button" onclick="switchView('view-register')"
+                    class="nav-btn px-4 py-2.5 rounded-xl text-sm font-semibold bg-emerald-800/60 hover:bg-emerald-900 active:bg-emerald-950 transition cursor-pointer">
+                    Daftar Anak
+                </button>
+                <button type="button" onclick="switchView('view-scan-gizi')"
+                    class="nav-btn px-4 py-2.5 rounded-xl text-sm font-semibold bg-emerald-800/60 hover:bg-emerald-900 active:bg-emerald-950 transition cursor-pointer">
+                    Scan Gizi
+                </button>
+                <button type="button" onclick="bukaHalamanKader()"
+                    class="nav-btn px-4 py-2.5 rounded-xl text-sm font-semibold bg-white/15 hover:bg-white/25 active:bg-white/30 transition cursor-pointer">
+                    Kader
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-5xl mx-auto px-5 py-6 sm:py-8">
+
+        <!-- VIEW: LANDING PAGE SECTION -->
+        <section id="view-landing" class="spa-view max-w-5xl mx-auto py-6 md:py-12">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                <!-- Teks Utama / Hero -->
+                <div class="space-y-6 text-center md:text-left">
+                    <span
+                        class="px-4 py-1.5 bg-emerald-100 text-emerald-800 text-xs font-semibold rounded-full uppercase tracking-wider">
+                        Inovasi Layanan Kesehatan Balita
+                    </span>
+                    <h1 class="text-4xl md:text-4xl font-black text-slate-900 leading-tight">
+                        SIPADU <br class="hidden md:inline">
+                        <span class="text-emerald-600">Sistem Pelayanan Posyandu</span>
+                    </h1>
+                    <p class="text-base text-slate-600 max-w-md mx-auto md:mx-0 leading-relaxed">
+                        Sistem pencatatan tumbuh kembang balita, pemantauan status gizi berkala, dan analisis kesehatan
+                        pintar berbasis kecerdasan buatan untuk masa depan anak yang lebih cerah.
+                    </p>
+                    <!-- Tombol Aksi Utama -->
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center md:justify-start pt-2">
+                        <button onclick="bukaHalamanKader()"
+                            class="px-6 py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-lg shadow-emerald-600/20 transition transform hover:-translate-y-0.5 text-sm cursor-pointer">
+                            Masuk Dashboard Kader
+                        </button>
+                        <button onclick="switchView('view-scan-gizi')"
+                            class="px-6 py-3.5 bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold rounded-xl transition text-sm cursor-pointer">
+                            Coba Scan Gizi AI
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Ilustrasi/Grafis Sederhana (Aesthetic Tailwind Grid) -->
+                <div class="grid grid-cols-2 gap-4 relative">
+                    <div class="space-y-4">
+                        <div class="bg-emerald-500/10 p-8 rounded-2xl border border-emerald-500/20 text-center">
+                            <div class="text-3xl font-extrabold text-emerald-600 mb-1">100%</div>
+                            <div class="text-xs font-medium text-slate-600 uppercase tracking-wide">Data Terintegrasi
+                            </div>
+                        </div>
+                        <div class="bg-slate-900 p-6 rounded-2xl text-white text-center shadow-xl">
+                            <div class="text-2xl font-bold mb-1">Smart AI</div>
+                            <div class="text-xs text-slate-400">Analisis Gizi Instan</div>
+                        </div>
+                    </div>
+                    <div class="space-y-4 pt-8">
+                        <div class="bg-white p-6 rounded-2xl border border-slate-200/60 shadow-md text-center">
+                            <div class="text-3xl font-extrabold text-slate-900 mb-1">Pantau</div>
+                            <div class="text-xs font-medium text-slate-500 uppercase tracking-wide">Timbangan Bulanan
+                            </div>
+                        </div>
+                        <div
+                            class="bg-emerald-600 p-6 rounded-2xl text-white text-center shadow-lg shadow-emerald-600/30">
+                            <div class="text-xl font-bold">Kader Aktif</div>
+                            <p class="text-xs text-emerald-100 mt-1">Pelayanan Responsif</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW: LOGIN KADER -->
+        <section id="view-login-kader"
+            class="spa-view hidden bg-white rounded-2xl shadow-sm border border-slate-200/80 p-6 sm:p-8 max-w-md mx-auto">
+            <header class="border-b border-slate-100 pb-5 mb-8 text-center sm:text-left">
+                <h2 class="text-2xl font-bold text-slate-900">Masuk Area Kader</h2>
+                <p class="text-base text-slate-500 mt-2">
+                    Halaman ini khusus kader dan bidan Posyandu. Warga umum tidak perlu login di sini.
+                </p>
+            </header>
+
+            <form id="form-login-kader" class="space-y-6">
+                <div>
+                    <label for="login-username" class="block text-base font-bold text-slate-700 mb-2">Username</label>
+                    <input type="text" id="login-username" required autocomplete="username"
+                        class="w-full px-4 py-3.5 border border-slate-200 rounded-xl text-base focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 focus:outline-none">
+                </div>
+                <div>
+                    <label for="login-password" class="block text-base font-bold text-slate-700 mb-2">Password</label>
+                    <input type="password" id="login-password" required autocomplete="current-password"
+                        class="w-full px-4 py-3.5 border border-slate-200 rounded-xl text-base focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 focus:outline-none">
+                </div>
+                <p id="login-error"
+                    class="hidden text-base text-red-600 font-medium bg-red-50 border border-red-100 rounded-xl px-4 py-3"
+                    role="alert"></p>
+                <button type="submit" id="btn-login-kader"
+                    class="btn-primary w-full bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold text-base rounded-xl cursor-pointer shadow-sm">
+                    Masuk Dashboard
+                </button>
+                <!-- Diubah agar kembali ke Landing Page jika batal login -->
+                <button type="button" onclick="switchView('view-landing')"
+                    class="w-full text-base font-semibold text-slate-500 hover:text-slate-700 py-2 transition cursor-pointer">
+                    Kembali ke Beranda Utama
+                </button>
+            </form>
+        </section>
+
+        <!-- VIEW: REGISTRASI (Ditambahkan class 'hidden' secara default agar tidak langsung tampil di awal) -->
+        <section id="view-register"
+            class="spa-view hidden bg-white rounded-2xl shadow-sm border border-slate-200/80 p-6 sm:p-8">
+            <header class="border-b border-slate-100 pb-5 mb-8">
+                <h2 class="text-2xl font-bold text-slate-900">Pendaftaran Profil Anak</h2>
+                <p class="text-base text-slate-500 mt-2">
+                    Isi data anak untuk pencatatan tumbuh kembang di Posyandu.
+                </p>
+            </header>
+
+            <form id="form-registrasi" class="space-y-6">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <div class="sm:col-span-2 sm:grid sm:grid-cols-2 sm:gap-6 sm:col-span-2">
+                        <div>
+                            <label for="reg-nama-anak" class="block text-base font-bold text-slate-700 mb-2">Nama
+                                Lengkap Anak</label>
+                            <input type="text" id="reg-nama-anak" required autocomplete="name"
+                                class="w-full px-4 py-3.5 border border-slate-200 rounded-xl text-base focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 focus:outline-none">
+                        </div>
+                        <div>
+                            <label for="reg-tgl-lahir" class="block text-base font-bold text-slate-700 mb-2">Tanggal
+                                Lahir</label>
+                            <input type="date" id="reg-tgl-lahir" required
+                                class="w-full px-4 py-3.5 border border-slate-200 rounded-xl text-base focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 focus:outline-none">
+                        </div>
+                    </div>
+                    <div>
+                        <label for="reg-jk" class="block text-base font-bold text-slate-700 mb-2">Jenis Kelamin</label>
+                        <select id="reg-jk" required
+                            class="w-full px-4 py-3.5 border border-slate-200 rounded-xl text-base focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 focus:outline-none bg-white">
+                            <option value="">— Pilih —</option>
+                            <option value="L">Laki-laki</option>
+                            <option value="P">Perempuan</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="reg-nama-ibu" class="block text-base font-bold text-slate-700 mb-2">Nama Ibu
+                            Kandung</label>
+                        <input type="text" id="reg-nama-ibu" required
+                            class="w-full px-4 py-3.5 border border-slate-200 rounded-xl text-base focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 focus:outline-none">
+                    </div>
+                    <div>
+                        <label for="reg-nohp" class="block text-base font-bold text-slate-700 mb-2">No. WhatsApp
+                            Aktif</label>
+                        <input type="tel" id="reg-nohp" placeholder="08xxxxxxxxxx" required inputmode="tel"
+                            class="w-full px-4 py-3.5 border border-slate-200 rounded-xl text-base focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 focus:outline-none">
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label for="reg-bb" class="block text-base font-bold text-slate-700 mb-2">BB Lahir
+                                (kg)</label>
+                            <input type="number" step="0.01" id="reg-bb" placeholder="3,2"
+                                class="w-full px-4 py-3.5 border border-slate-200 rounded-xl text-base focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 focus:outline-none">
+                        </div>
+                        <div>
+                            <label for="reg-tb" class="block text-base font-bold text-slate-700 mb-2">TB Lahir
+                                (cm)</label>
+                            <input type="number" step="0.1" id="reg-tb" placeholder="49"
+                                class="w-full px-4 py-3.5 border border-slate-200 rounded-xl text-base focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 focus:outline-none">
+                        </div>
+                    </div>
+                </div>
+                <button type="submit" id="btn-submit-registrasi"
+                    class="btn-primary w-full bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold text-base rounded-xl mt-2 cursor-pointer shadow-sm">
+                    Simpan Profil Anak
+                </button>
+            </form>
+        </section>
+
+        <!-- VIEW: SCAN GIZI AI — menu utama, tampilan dominan -->
+        <section id="view-scan-gizi"
+            class="spa-view hidden bg-white rounded-2xl shadow-sm border border-slate-200/80 p-6 sm:p-8 w-full">
+            <header class="border-b border-slate-100 pb-5 mb-8">
+                <h2 class="text-2xl font-bold text-slate-900">Scan Gizi Makanan</h2>
+                <p class="text-base text-slate-500 mt-2">
+                    Foto piring makan si kecil, lalu AI akan membantu menilai kandungan gizinya.
+                </p>
+            </header>
+
+            <div class="space-y-6">
+                <div>
+                    <label for="scan-anak-id" class="block text-base font-bold text-slate-700 mb-2">Pilih Anak</label>
+                    <select id="scan-anak-id"
+                        class="w-full px-4 py-3.5 border border-slate-200 rounded-xl text-base focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white">
+                        <option value="">Memuat daftar anak...</option>
+                    </select>
+                </div>
+
+                <!-- Area foto -->
+                <div class="border-2 border-dashed border-slate-200 rounded-2xl p-6 sm:p-8 bg-slate-50/80 text-center">
+                    <div id="preview-wrapper" class="hidden mb-5 flex justify-center">
+                        <img id="preview-foto" alt="Pratinjau foto makanan"
+                            class="rounded-xl shadow-sm max-h-64 w-auto">
+                    </div>
+                    <div id="upload-placeholder" class="py-4 space-y-3">
+                        <p class="text-base text-slate-600 font-medium">Belum ada foto</p>
+                        <p class="text-sm text-slate-500 max-w-sm mx-auto">
+                            Pastikan piring makanan terlihat jelas dan pencahayaannya cukup.
+                        </p>
+                    </div>
+                    <label
+                        class="btn-primary inline-flex items-center justify-center mt-4 bg-white border-2 border-emerald-600 text-emerald-700 font-bold px-8 py-3.5 rounded-xl text-base hover:bg-emerald-50 active:bg-emerald-100 transition cursor-pointer shadow-sm">
+                        Ambil Foto Makanan
+                        <input type="file" id="input-foto" accept="image/*" capture="environment" class="hidden">
+                    </label>
+                </div>
+
+                <button type="button" id="btn-scan-gizi" onclick="prosesScanGiziAI()"
+                    class="btn-primary w-full bg-slate-800 hover:bg-slate-900 active:bg-black text-white font-bold text-base rounded-xl cursor-pointer shadow-sm flex justify-center items-center gap-2">
+                    Mulai Analisis Gizi
+                </button>
+
+                <!-- Hasil analisis — wadah lebar, tanpa pembatas tinggi -->
+                <div id="hasil-scan-container"
+                    class="hidden mt-6 border-2 p-6 rounded-2xl bg-emerald-50/70 border-emerald-200 shadow-xs w-full"
+                    aria-live="polite">
+                    <div
+                        class="flex flex-wrap items-center justify-between gap-3 border-b-2 border-emerald-200 pb-4 mb-5">
+                        <h3 class="text-xl font-bold text-emerald-900">Hasil Analisis Gizi Lengkap</h3>
+                        <span id="badge-status-gizi" class="text-sm font-bold px-4 py-1.5 rounded-full"></span>
+                    </div>
+                    <div id="text-analisis-ai"
+                        class="text-sm text-slate-800 leading-relaxed font-normal whitespace-pre-line w-full">
+                        <!-- Seluruh ulasan AI ditampilkan utuh via JS -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW: ADMIN KADER — Dashboard Advanced -->
+        <section id="view-admin"
+            class="spa-view hidden bg-white rounded-2xl shadow-sm border border-slate-200/80 p-6 sm:p-8 w-full">
+            <header
+                class="border-b border-slate-100 pb-5 mb-6 flex flex-col lg:flex-row lg:justify-between lg:items-start gap-4">
+                <div>
+                    <h2 class="text-2xl font-bold text-slate-900">Dashboard Kader Posyandu</h2>
+                    <p class="text-base text-slate-500 mt-2">Pusat kendali pencatatan balita, pemeriksaan bulanan, dan
+                        log nutrisi AI.</p>
+                </div>
+                <button type="button" onclick="logoutKader()"
+                    class="btn-primary shrink-0 bg-red-50 hover:bg-red-100 active:bg-red-200 text-red-700 border border-red-200 px-6 py-3 rounded-xl text-base font-bold transition cursor-pointer">
+                    Keluar
+                </button>
+            </header>
+
+            <!-- Tab navigasi dashboard -->
+            <nav class="flex flex-wrap gap-2 mb-6 pb-4 border-b border-slate-200" aria-label="Menu dashboard kader">
+                <button type="button" id="tab-btn-ringkasan" onclick="switchAdminTab('ringkasan')"
+                    class="admin-tab-btn active px-4 py-2.5 rounded-xl text-sm font-bold bg-emerald-600 text-white cursor-pointer">
+                    Ringkasan
+                </button>
+                <button type="button" id="tab-btn-data-anak" onclick="switchAdminTab('data-anak')"
+                    class="admin-tab-btn px-4 py-2.5 rounded-xl text-sm font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 cursor-pointer">
+                    Data Anak
+                </button>
+                <button type="button" id="tab-btn-catatan-bulanan" onclick="switchAdminTab('catatan-bulanan')"
+                    class="admin-tab-btn px-4 py-2.5 rounded-xl text-sm font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 cursor-pointer">
+                    Catatan Bulanan
+                </button>
+                <button type="button" id="tab-btn-log-nutrisi" onclick="switchAdminTab('log-nutrisi')"
+                    class="admin-tab-btn px-4 py-2.5 rounded-xl text-sm font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 cursor-pointer">
+                    Log Nutrisi AI
+                </button>
+            </nav>
+
+            <!-- TAB: Ringkasan -->
+            <div id="admin-tab-ringkasan" class="admin-tab-panel space-y-6">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div class="p-5 rounded-2xl bg-emerald-50 border border-emerald-100">
+                        <p class="text-sm font-bold text-emerald-800">Total Anak Terdaftar</p>
+                        <p id="stat-total-anak" class="text-3xl font-bold text-emerald-900 mt-2">—</p>
+                    </div>
+                    <div class="p-5 rounded-2xl bg-amber-50 border border-amber-100">
+                        <p class="text-sm font-bold text-amber-800">Scan Nutrisi AI</p>
+                        <p id="stat-total-nutrisi" class="text-3xl font-bold text-amber-900 mt-2">—</p>
+                    </div>
+                    <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200">
+                        <p class="text-sm font-bold text-slate-700">Status Gemini AI</p>
+                        <p id="stat-gemini-status" class="text-base font-bold text-slate-900 mt-2">—</p>
+                    </div>
+                </div>
+
+                <div id="gemini-key-guard"
+                    class="p-5 bg-amber-50 border border-amber-200 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                    <div>
+                        <p id="gemini-guard-title" class="text-base font-bold text-amber-900">API Key Gemini belum
+                            terpasang</p>
+                        <p id="gemini-guard-desc" class="text-sm text-amber-800 mt-1">
+                            Atur kunci API Gemini agar fitur Scan Gizi warga bisa berjalan.
+                        </p>
+                    </div>
+                    <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                        <input type="password" id="web-gemini-key" placeholder="AIzaSy..."
+                            class="bg-white border border-amber-200 text-base px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-400 w-full sm:w-64">
+                        <button type="button" onclick="simpanGeminiKey()"
+                            class="btn-primary bg-amber-600 hover:bg-amber-700 active:bg-amber-800 text-white text-base font-bold px-6 py-3 rounded-xl cursor-pointer whitespace-nowrap">
+                            Simpan Key
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB: Data Anak -->
+            <div id="admin-tab-data-anak" class="admin-tab-panel hidden space-y-4">
+                <div class="flex flex-wrap items-center justify-between gap-3">
+                    <h3 class="text-lg font-bold text-slate-900">Rekapitulasi Profil Anak</h3>
+                    <button type="button" onclick="fetchDataAnakAdmin()"
+                        class="btn-primary bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-slate-800 px-6 py-3 rounded-xl text-base font-bold transition cursor-pointer">
+                        Segarkan Data
+                    </button>
+                </div>
+                <div class="overflow-x-auto rounded-xl border border-slate-200 w-full">
+                    <table class="w-full text-left text-base text-slate-600 min-w-[720px]">
+                        <thead class="bg-slate-50 text-slate-700 font-bold border-b border-slate-200">
+                            <tr>
+                                <th class="p-4">Nama Anak</th>
+                                <th class="p-4">Tgl Lahir (Umur)</th>
+                                <th class="p-4">L/P</th>
+                                <th class="p-4">Nama Ibu</th>
+                                <th class="p-4">No. WA</th>
+                                <th class="p-4">BB/TB Lahir</th>
+                                <th class="p-4">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabel-anak-admin">
+                            <tr>
+                                <td colspan="7" class="p-6 text-center text-slate-400">Memuat data...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- TAB: Catatan Bulanan Posyandu -->
+            <div id="admin-tab-catatan-bulanan" class="admin-tab-panel hidden space-y-8">
+                <div>
+                    <h3 class="text-lg font-bold text-slate-900 mb-1">Pencatatan Bulanan Posyandu</h3>
+                    <p class="text-base text-slate-500">Input antropometri balita setiap kegiatan Posyandu bulanan.</p>
+                </div>
+
+                <form id="form-pemeriksaan-bulanan"
+                    class="p-6 rounded-2xl border-2 border-emerald-100 bg-emerald-50/40 space-y-6"
+                    onsubmit="event.preventDefault(); simpanPemeriksaanBulanan();">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        <div class="sm:col-span-2">
+                            <label for="pemeriksaan-anak-id" class="block text-base font-bold text-slate-700 mb-2">Pilih
+                                Anak</label>
+                            <select id="pemeriksaan-anak-id" required
+                                class="w-full px-4 py-3.5 border border-slate-200 rounded-xl text-base focus:ring-2 focus:ring-emerald-500 focus:outline-none bg-white">
+                                <option value="">Memuat daftar anak...</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="pemeriksaan-tanggal"
+                                class="block text-base font-bold text-slate-700 mb-2">Tanggal Pemeriksaan</label>
+                            <input type="date" id="pemeriksaan-tanggal" required
+                                class="w-full px-4 py-3.5 border border-slate-200 rounded-xl text-base focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                        </div>
+                        <div>
+                            <label for="pemeriksaan-bb" class="block text-base font-bold text-slate-700 mb-2">Berat
+                                Badan (kg)</label>
+                            <input type="number" step="0.1" id="pemeriksaan-bb" required placeholder="10.5"
+                                class="w-full px-4 py-3.5 border border-slate-200 rounded-xl text-base focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                        </div>
+                        <div>
+                            <label for="pemeriksaan-tb" class="block text-base font-bold text-slate-700 mb-2">Tinggi
+                                Badan (cm)</label>
+                            <input type="number" step="0.1" id="pemeriksaan-tb" required placeholder="75.0"
+                                class="w-full px-4 py-3.5 border border-slate-200 rounded-xl text-base focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                        </div>
+                        <div>
+                            <label for="pemeriksaan-lk" class="block text-base font-bold text-slate-700 mb-2">Lingkar
+                                Kepala (cm)</label>
+                            <input type="number" step="0.1" id="pemeriksaan-lk" placeholder="45.0"
+                                class="w-full px-4 py-3.5 border border-slate-200 rounded-xl text-base focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                        </div>
+                        <div class="sm:col-span-2">
+                            <label for="pemeriksaan-catatan"
+                                class="block text-base font-bold text-slate-700 mb-2">Catatan / Vitamin</label>
+                            <input type="text" id="pemeriksaan-catatan" placeholder="Contoh: Vitamin A, MT, dll."
+                                class="w-full px-4 py-3.5 border border-slate-200 rounded-xl text-base focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                        </div>
+                    </div>
+                    <button type="submit" id="btn-simpan-pemeriksaan"
+                        class="btn-primary w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold text-base px-8 py-3.5 rounded-xl cursor-pointer shadow-sm">
+                        Simpan Data Pemeriksaan
+                    </button>
+                </form>
+                <div id="stat-pemeriksaan-bulan" class="hidden"></div>
+                <div class="bg-white rounded-2xl border border-slate-100 p-4 md:p-6 shadow-sm">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+                        <div>
+                            <h3 class="text-lg font-bold text-slate-900">Rekapan Pemeriksaan Bulanan</h3>
+                            <p class="text-xs text-slate-500 mt-0.5">Daftar riwayat timbangan dan pengukuran balita</p>
+                        </div>
+
+                        <div class="w-full sm:w-48">
+                            <select id="filter-bulan-timbang" onchange="loadTabelPemeriksaanBulanan()"
+                                class="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none bg-white font-medium text-slate-700 shadow-sm">
+                                <option value="all">Semua Bulan</option>
+                                <option value="-01-">Januari</option>
+                                <option value="-02-">Februari</option>
+                                <option value="-03-">Maret</option>
+                                <option value="-04-">April</option>
+                                <option value="-05-">Mei</option>
+                                <option value="-06-">Juni</option>
+                                <option value="-07-">Juli</option>
+                                <option value="-08-">Agustus</option>
+                                <option value="-09-">September</option>
+                                <option value="-10-">Oktober</option>
+                                <option value="-11-">November</option>
+                                <option value="-12-">Desember</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="overflow-x-auto -mx-4 md:mx-0">
+                        <table class="w-full text-left border-collapse min-w-[600px]">
+                            <thead>
+                                <tr
+                                    class="border-b border-slate-100 bg-slate-50/70 text-slate-500 font-semibold text-xs tracking-wider uppercase">
+                                    <th class="p-3">Tanggal</th>
+                                    <th class="p-3">Nama Anak</th>
+                                    <th class="p-3">Berat Badan</th>
+                                    <th class="p-3">Tinggi Badan</th>
+                                    <th class="p-3">Lingkar Kepala</th>
+                                    <th class="p-3">Catatan Kader</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabel-pemeriksaan-bulanan"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB: Log Nutrisi AI -->
+            <div id="admin-tab-log-nutrisi" class="admin-tab-panel hidden space-y-4">
+                <div class="flex flex-wrap items-center justify-between gap-3">
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-900">Log Nutrisi AI (Scan Makanan)</h3>
+                        <p class="text-sm text-slate-500 mt-1">Riwayat analisis gizi dari fitur Scan Gizi warga.</p>
+                    </div>
+                    <button type="button" onclick="loadLogNutrisiAI()"
+                        class="btn-primary bg-slate-100 hover:bg-slate-200 text-slate-800 px-5 py-2.5 rounded-xl text-sm font-bold cursor-pointer">
+                        Segarkan Log
+                    </button>
+                </div>
+                <div id="log-nutrisi-container" class="w-full space-y-4 mt-4">
+                    <div class="p-6 text-center text-slate-400 bg-white border border-slate-200 rounded-xl">
+                        ⏳ Memuat log nutrisi anak...
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- MODAL: BUKAN MAKANAN -->
+    <div id="modal-bukan-makanan" class="hidden fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4"
+        role="dialog" aria-modal="true" aria-labelledby="modal-bukan-makanan-title">
+        <div class="absolute inset-0 bg-slate-900/50" onclick="tutupModalBukanMakanan()"></div>
+        <div class="relative bg-white rounded-2xl shadow-xl max-w-md w-full p-6 sm:p-8 animate-[fadeIn_0.2s_ease-out]">
+            <div class="w-12 h-12 rounded-full bg-amber-100 flex items-center justify-center mb-4">
+                <span class="text-2xl" aria-hidden="true">📷</span>
+            </div>
+            <h3 id="modal-bukan-makanan-title" class="text-xl font-bold text-slate-900 mb-3">Foto belum terdeteksi
+                sebagai makanan</h3>
+            <p class="text-base text-slate-600 leading-relaxed mb-6">
+                Waduh, kamera AI tidak melihat adanya makanan atau minuman di foto ini.
+                Silakan pastikan piring porsi makanan si kecil terlihat jelas, lalu coba foto kembali ya, Ibu!
+            </p>
+            <button type="button" onclick="tutupModalBukanMakanan()"
+                class="btn-primary w-full bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold text-base rounded-xl cursor-pointer">
+                Baik, Saya Foto Ulang
+            </button>
+        </div>
+    </div>
+
+
+    <!-- TOAST NOTIFIKASI -->
+    <div id="toast"
+        class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-50 max-w-sm w-[calc(100%-2rem)] px-5 py-4 rounded-xl shadow-lg text-base font-medium text-center"
+        role="status"></div>
+
+    <!-- JS Eksternal: urutan penting — supabase.js harus pertama -->
+    <script src="src/supabase.js"></script>
+    <script src="src/admin.js"></script>
+    <script src="src/ai.js"></script>
+</body>
+
+</html>
