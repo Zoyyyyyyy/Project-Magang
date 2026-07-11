@@ -115,15 +115,19 @@ values ('kaderposyandu', 'posyandu2026');
 ```
 ## 🚀 Cara Menjalankan Lokal
 1. Clone Repository
+```
 Bash
 git clone https://github.com/Zoyyyyyyy/Project-Magang/tree/main/SIPADU
 cd project-posyandu
-2. Konfigurasi Kredensial Supabase
+```
+3. Konfigurasi Kredensial Supabase
 Buka file src/supabase.js dan pastikan konfigurasi client sudah mengarah ke proyek Supabase kamu:
+```
 JavaScript
 const supabaseUrl = '[https://xxxxxxxx.supabase.co](https://xxxxxxxx.supabase.co)'
 const supabaseKey = 'eyJxxxxxxxxxxxxxxxxxxxxxxxx'
-3. Jalankan Aplikasi
+```
+4. Jalankan Aplikasi
 Buka index.html menggunakan fitur Live Server di IDE kamu.
 ---
 ## 📁 Struktur Project
