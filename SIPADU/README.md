@@ -46,8 +46,6 @@
 |---|---|
 | ![Scan AI](src/img/scan_ai.png) | ![Log Nutrisi AI](src/img/log_nutrisi_ai.png) |
 
-> 📁 *Seluruh screenshot aplikasi di atas tersimpan dengan aman pada folder `src/img/`.*
-
 ---
 
 ## 🛠️ Tech Stack
@@ -146,9 +144,7 @@ project-posyandu/
         ├── data_anak.png
         ├── log_nutrisi_ai.png
         └── scan_ai.png
-📄 Lisensi
-Project ini dilisensikan di bawah MIT License.
-
+        
 Dibuat dengan ❤️ untuk kemajuan Kesehatan Anak Indonesia
 
 ⭐ Beri bintang pada repository ini jika bermanfaat!
