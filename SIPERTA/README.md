@@ -96,39 +96,41 @@ values
 Catatan Keamanan (RLS): Pastikan Anda telah mengaktifkan Row Level Security (RLS) pada tabel arsip_surat dan admin_config guna melindungi data NIK warga dan kredensial password admin agar tidak disalahgunakan dari publik di sisi frontend.
 ```
 
-🕹️ Alur Penggunaan & Demo Aplikasi
+### 🕹️ Alur Penggunaan & Demo Aplikasi
 Berikut adalah alur kerja (workflow) operasional penggunaan sistem informasi layanan SIPERTA:
 
-👥 1. Sisi Pengguna (Warga Umum)
-- 1. Akses Landing Page: Pengguna membuka website dan disambut oleh dashboard layanan mandiri yang modern. Warga dapat memilih opsi navigasi utama melalui tombol CTA.
+### 👥 1. Sisi Pengguna (Warga Umum)
+- ### 1. Akses Landing Page: Pengguna membuka website dan disambut oleh dashboard layanan mandiri yang modern. Warga dapat memilih opsi navigasi utama melalui tombol CTA.
 
 Membuat Surat Pengantar:
 
-- 2. Masuk ke menu Surat Pengantar.
+### 2. Masuk ke menu Surat Pengantar.
 - Isi formulir identitas kependudukan lengkap Anda.
 - Pada kolom Keperluan Detail, ketik alasan Anda menggunakan bahasa sehari-hari.
 - Klik tombol ✨ Format dengan AI. Sistem otomatis memformat teks tersebut menjadi kalimat baku resmi dan langsung menggantikan teks input awal.
 - Klik Cetak Surat atau Download PDF Manual untuk mengunduh dokumen fisik.
-
-- 3. Mengirim Laporan Pengaduan:
+  
+### 3. Mengirim Laporan Pengaduan:
 - Masuk ke menu Form Pengaduan.
 - Isi Nama Pelapor, Nomor WhatsApp aktif, jenis fasilitas, dan deskripsi singkat masalah.
 - Klik kirim. Riwayat aduan Anda akan masuk ke Tabel Pantauan Aduan Publik dengan status awal "Diproses".
 
-🔐 2. Sisi Admin (Ketua RT)
-- 1. Login Administrator / Live Demo:
+### 🔐 2. Sisi Admin (Ketua RT)
+### 1. Login Administrator / Live Demo:
 - Klik tombol Masuk sebagai Admin di pojok kanan atas halaman.
 - Masukkan kata sandi utama (PasswordRT123) atau kata sandi akses pengujian untuk live demo (DemoWarga123).
-- 2. Manajemen Laporan Pengaduan:
+  
+### 2. Manajemen Laporan Pengaduan:
 - Ketua RT dapat memantau seluruh keluhan fasilitas yang dikirimkan oleh warga secara real-time.
 - Mengubah status penanganan aduan (misal dari "Diproses" menjadi "Selesai") setelah perbaikan fasilitas selesai dilakukan.
-- 3. Pembuat Undangan Warga (AI Agenda):
+  
+### 3. Pembuat Undangan Warga (AI Agenda):
 - Masuk ke menu pembuatan undangan kegiatan warga.
 - Ketik poin agenda kotor di kolom acara, lalu klik ✨ Format dengan AI untuk menyusun susunan acara resmi secara otomatis dengan struktur penomoran yang rapi.
 - Klik Cetak Surat Undangan untuk mengarsipkan ke database dan mengunduh berkas fisik siap edar.
 
-🚀 Cara Menjalankan Lokal
-- 1 . Clone Repository
+### 🚀 Cara Menjalankan Lokal
+### 1 . Clone Repository
 ```
 Bash
 git clone [https://github.com/Zoyyyyyyy/Project-Magang/tree/main/SIPERTA](https://github.com/Zoyyyyyyy/Project-Magang/tree/main/SIPERTA)
@@ -144,7 +146,7 @@ const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
 Jalankan Aplikasi
 Jalankan file index.html menggunakan ekstensi Live Server di IDE pilihan Anda (seperti VS Code atau lingkungan kerja AntiGravity).
 
-- 2. 📁 Struktur Project
+### 2. 📁 Struktur Project
 Penyusunan folder dikembangkan menggunakan arsitektur bersih berstandar industri:
 ```
 SIPERTA/
