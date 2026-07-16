@@ -100,7 +100,7 @@ Catatan Keamanan (RLS): Pastikan Anda telah mengaktifkan Row Level Security (RLS
 Berikut adalah alur kerja (workflow) operasional penggunaan sistem informasi layanan SIPERTA:
 
 ### 👥 1. Sisi Pengguna (Warga Umum)
-- ### 1. Akses Landing Page: Pengguna membuka website dan disambut oleh dashboard layanan mandiri yang modern. Warga dapat memilih opsi navigasi utama melalui tombol CTA.
+### 1. Akses Landing Page: Pengguna membuka website dan disambut oleh dashboard layanan mandiri yang modern. Warga dapat memilih opsi navigasi utama melalui tombol CTA.
 
 Membuat Surat Pengantar:
 
@@ -141,7 +141,7 @@ Buka file inisialisasi source code database Anda (misal src/supabase.js) dan ses
 ```
 JavaScript
 const supabaseUrl = '[https://xxxxxxxxxxxxxxxxxxxx.supabase.co](https://xxxxxxxxxxxxxxxxxxxx.supabase.co)'
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
+const supabaseKey = 'eyxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx...'
 ```
 Jalankan Aplikasi
 Jalankan file index.html menggunakan ekstensi Live Server di IDE pilihan Anda (seperti VS Code atau lingkungan kerja AntiGravity).
