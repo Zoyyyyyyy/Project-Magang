@@ -1,3 +1,4 @@
+<div align="center">
 # 🏢 Web SIPERTA (Sistem Pelayanan RT Mandiri)
 ### AI Document Formatter & Digital Complaint Management
 
@@ -7,7 +8,6 @@
 [![Supabase](https://img.shields.io/badge/Supabase-Database-blue?style=for-the-badge&logo=supabase)](https://supabase.com)
 [![Gemini AI](https://img.shields.io/badge/Google_Gemini-AI_Formatter-orange?style=for-the-badge&logo=googlegemini)](https://ai.google.dev/)
 [![Vercel](https://img.shields.io/badge/Deploy-Vercel-black?style=for-the-badge&logo=vercel)](https://vercel.com)
-
 </div>
 
 ---
@@ -162,4 +162,6 @@ SIPERTA/
         ├── menu_formpembuatansurat.png
         └── menu_formpengajuan.png
 ```
+<div align="center">
 ⭐ Beri bintang pada repository ini jika proyek ini membantu Anda!
+</div>
