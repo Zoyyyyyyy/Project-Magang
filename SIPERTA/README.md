@@ -92,7 +92,7 @@ create table admin_config (
 -- Memasukkan password akun admin utama dan akun untuk live demo
 insert into admin_config (key, value) 
 values 
-  ('admin_password', 'PasswordRT123'),
+  ('admin_password', 'xxxxxxxxx'),
   ('demo_password', 'DemoWarga123');
 Catatan Keamanan (RLS): Pastikan Anda telah mengaktifkan Row Level Security (RLS) pada tabel arsip_surat dan admin_config guna melindungi data NIK warga dan kredensial password admin agar tidak disalahgunakan dari publik di sisi frontend.
 ```
