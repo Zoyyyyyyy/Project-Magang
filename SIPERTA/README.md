@@ -119,7 +119,7 @@ Membuat Surat Pengantar:
 ### 🔐 2. Sisi Admin (Ketua RT)
 ### 1. Login Administrator / Live Demo:
 - Klik tombol Masuk sebagai Admin di pojok kanan atas halaman.
-- Masukkan kata sandi utama (PasswordRT123) atau kata sandi akses pengujian untuk live demo (DemoWarga123).
+- Masukkan kata sandi akses pengujian untuk live demo (DemoWarga123).
   
 ### 2. Manajemen Laporan Pengaduan:
 - Ketua RT dapat memantau seluruh keluhan fasilitas yang dikirimkan oleh warga secara real-time.
