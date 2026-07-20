@@ -134,7 +134,7 @@ Untuk mempermudah pengujian, berikut adalah alur kerja (workflow) penggunaan Web
 1. **Login Kader:**
    - Masuk ke halaman khusus admin.
    - Masukkan *Username* dan *Password* yang terdaftar pada tabel `admin_accounts` di database.
-   - Untuk Live Demo Gunakan : Username (Adminkader) Password (passwordPosyandu123)
+   - Untuk Live Demo Gunakan : Username (adminKader) Password (passwordPosyandu123)
 2. **Dashboard Ringkasan:** Setelah sukses login, kader disuguhkan ringkasan berupa:
    - Total anak yang terdaftar di sistem.
    - Total akumulasi scan nutrisi AI yang telah dilakukan oleh user.
