@@ -163,4 +163,6 @@ MajuLokal/
         ├── generator_konten.png
         └── admin_page.png
 ```
-
+<div align="center">
+⭐ Beri bintang pada repository ini jika bermanfaat!
+</div>
