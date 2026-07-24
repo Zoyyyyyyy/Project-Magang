@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MajuLokal – AI Business Launchpad untuk UMKM</title>
+    <meta name="description"
+        content="MajuLokal membantu Anda membangun fondasi bisnis mikro, merencanakan strategi 4 minggu, dan membuat konten promosi multisaluran secara otomatis dengan AI." />
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet" />
+
+    <!-- Tailwind custom config (must run before any Tailwind class is used) -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50:  '#fff7ed',
+                            100: '#ffedd5',
+                            200: '#fed7aa',
+                            300: '#fdba74',
+                            400: '#fb923c',
+                            500: '#FE7F2D',
+                            600: '#ea6c15',
+                            700: '#c2550f',
+                            800: '#9a4412',
+                            900: '#7c3d12',
+                        },
+                        slate: {
+                            850: '#1a2234',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                    },
+                    animation: {
+                        'fade-in':   'fadeIn 0.4s ease forwards',
+                        'slide-up':  'slideUp 0.4s ease forwards',
+                        'pulse-soft':'pulseSoft 2s infinite',
+                    },
+                    keyframes: {
+                        fadeIn:     { from: { opacity: 0 }, to: { opacity: 1 } },
+                        slideUp:    { from: { opacity: 0, transform: 'translateY(20px)' }, to: { opacity: 1, transform: 'translateY(0)' } },
+                        pulseSoft:  { '0%,100%': { opacity: 1 }, '50%': { opacity: 0.6 } },
+                    }
+                }
+            }
+        };
+    </script>
+
+    <style>
+        * { font-family: 'Plus Jakarta Sans', sans-serif; }
+
+        .view-section { display: none; }
+        .view-section.active {
+            display: block;
+            animation: fadeInSection 0.35s ease forwards;
+        }
+        @keyframes fadeInSection {
+            from { opacity: 0; transform: translateY(14px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .tab-btn.active-tab {
+            background-color: #FE7F2D;
+            color: #fff;
+            box-shadow: 0 4px 14px rgba(254, 127, 45, 0.35);
+        }
+        .tab-btn { transition: all 0.22s ease; }
+
+        .nav-link.active-nav { color: #FE7F2D; border-bottom: 2px solid #FE7F2D; }
+        .nav-link { transition: color 0.2s, border-color 0.2s; }
+
+        .card-choice { transition: transform 0.2s, box-shadow 0.2s; }
+        .card-choice:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 16px 40px rgba(254, 127, 45, 0.15);
+        }
+
+        .btn-primary { transition: transform 0.15s, box-shadow 0.15s, background-color 0.15s; }
+        .btn-primary:hover  { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(254, 127, 45, 0.4); }
+        .btn-primary:active { transform: translateY(0); }
+
+        .spinner {
+            border: 3px solid #fed7aa;
+            border-top-color: #FE7F2D;
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            animation: spin 0.7s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .roadmap-week {
+            background: linear-gradient(135deg, #fff7ed 0%, #fff 100%);
+            border-left: 4px solid #FE7F2D;
+        }
+
+        textarea:focus, input:focus, select:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(254, 127, 45, 0.25);
+        }
+
+        ::-webkit-scrollbar       { width: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #fdba74; border-radius: 9999px; }
+
+        .toast {
+            animation: toastIn 0.3s ease, toastOut 0.3s ease 2.7s forwards;
+        }
+        @keyframes toastIn  { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes toastOut { from { opacity: 1; } to { opacity: 0; } }
+
+        .mobile-menu { transition: max-height 0.3s ease, opacity 0.3s ease; overflow: hidden; }
+        .mobile-menu.open   { max-height: 300px; opacity: 1; }
+        .mobile-menu.closed { max-height: 0;     opacity: 0; }
+
+        .admin-table tr:hover td { background-color: #fff7ed; }
+    </style>
+</head>
+
+<body class="bg-slate-50 text-slate-800 min-h-screen">
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         NAVBAR
+    ═══════════════════════════════════════════════════════════════ -->
+    <nav class="bg-white/90 backdrop-blur-md sticky top-0 z-50 border-b border-slate-100 shadow-sm">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6">
+            <div class="flex items-center justify-between h-16">
+
+                <!-- Logo — click handled in app.js via querySelector -->
+                <div class="flex items-center gap-2 cursor-pointer">
+                    <div class="w-9 h-9 rounded-xl bg-brand-500 flex items-center justify-center shadow-md">
+                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2.2"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                    </div>
+                    <span class="text-xl font-extrabold text-slate-800 tracking-tight">
+                        Maju<span class="text-brand-500">Lokal</span>
+                    </span>
+                </div>
+
+                <!-- Desktop Nav -->
+                <div class="hidden md:flex items-center gap-1">
+                    <button id="nav-inkubasi"
+                        class="nav-link active-nav px-4 py-2 text-sm font-semibold rounded-lg">
+                        🌱 Inkubasi Bisnis
+                    </button>
+                    <button id="nav-promosi"
+                        class="nav-link px-4 py-2 text-sm font-semibold text-slate-600 rounded-lg hover:text-brand-500">
+                        📣 Promosi Harian
+                    </button>
+                    <button id="nav-admin"
+                        class="nav-link px-4 py-2 text-sm font-semibold text-slate-600 rounded-lg hover:text-brand-500">
+                        ⚙️ Admin
+                    </button>
+                </div>
+
+                <!-- Mobile Hamburger -->
+                <button id="hamburger-btn" class="md:hidden p-2 rounded-lg hover:bg-slate-100" aria-label="Buka menu">
+                    <svg class="w-6 h-6 text-slate-700" fill="none" stroke="currentColor" stroke-width="2"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Mobile Menu -->
+            <div id="mobile-menu" class="mobile-menu closed md:hidden">
+                <div class="py-3 space-y-1 border-t border-slate-100">
+                    <!-- Listeners attached in app.js — no onclick here -->
+                    <button class="w-full text-left px-4 py-3 text-sm font-semibold text-slate-700 hover:bg-brand-50 rounded-lg">
+                        🌱 Inkubasi Bisnis
+                    </button>
+                    <button class="w-full text-left px-4 py-3 text-sm font-semibold text-slate-700 hover:bg-brand-50 rounded-lg">
+                        📣 Promosi Harian
+                    </button>
+                    <button class="w-full text-left px-4 py-3 text-sm font-semibold text-slate-700 hover:bg-brand-50 rounded-lg">
+                        ⚙️ Admin
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         MAIN CONTENT
+    ═══════════════════════════════════════════════════════════════ -->
+    <main class="max-w-6xl mx-auto px-4 sm:px-6 py-8">
+
+        <!-- ─────────────────────────────────────────────────────────────
+             MENU 1: INKUBASI BISNIS
+        ───────────────────────────────────────────────────────────── -->
+        <section id="view-inkubasi" class="view-section active">
+
+            <!-- Hero header -->
+            <div class="text-center mb-10">
+                <span class="inline-block px-3 py-1 bg-brand-100 text-brand-600 text-xs font-bold rounded-full uppercase tracking-widest mb-4">
+                    Fase 1 — Inkubasi
+                </span>
+                <h1 class="text-3xl sm:text-4xl font-extrabold text-slate-900 leading-tight mb-3">
+                    Wujudkan Mimpi Bisnis<br />
+                    <span class="text-brand-500">Bersama AI</span>
+                </h1>
+                <p class="text-slate-500 max-w-xl mx-auto text-base">
+                    Ceritakan kondisimu dan modal yang kamu punya. AI kami akan menghasilkan 3 ide bisnis profesional
+                    lengkap dengan rencana aksi 4 minggu.
+                </p>
+            </div>
+
+            <!-- Form Card -->
+            <div class="max-w-2xl mx-auto">
+                <div class="bg-white rounded-2xl shadow-lg border border-slate-100 p-6 sm:p-8 mb-8">
+                    <h2 class="text-lg font-bold text-slate-800 mb-5 flex items-center gap-2">
+                        <span class="w-7 h-7 rounded-lg bg-brand-500 text-white text-xs flex items-center justify-center font-bold">1</span>
+                        Isi Data Awalmu
+                    </h2>
+
+                    <div class="space-y-5">
+                        <!-- Nama -->
+                        <div>
+                            <label for="inkubasi-nama" class="block text-sm font-semibold text-slate-700 mb-1.5">
+                                Nama Lengkap <span class="text-brand-500">*</span>
+                            </label>
+                            <input id="inkubasi-nama" type="text" placeholder="Contoh: Budi Santoso"
+                                class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm bg-slate-50 text-slate-800 placeholder-slate-400 transition-all" />
+                        </div>
+
+                        <!-- Kondisi -->
+                        <div>
+                            <label for="inkubasi-kondisi" class="block text-sm font-semibold text-slate-700 mb-1.5">
+                                Ceritakan Kondisimu <span class="text-brand-500">*</span>
+                            </label>
+                            <textarea id="inkubasi-kondisi" rows="4"
+                                placeholder="Contoh: Saya baru kena PHK, tinggal di desa dekat sawah, punya tetangga banyak ibu rumah tangga yang suka masak..."
+                                class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm bg-slate-50 text-slate-800 placeholder-slate-400 resize-none transition-all"></textarea>
+                            <p class="text-xs text-slate-400 mt-1">Gunakan bahasa sehari-hari, semakin detail semakin baik hasilnya.</p>
+                        </div>
+
+                        <!-- Modal -->
+                        <div>
+                            <label for="inkubasi-modal" class="block text-sm font-semibold text-slate-700 mb-1.5">
+                                Perkiraan Modal Awal (Rp) <span class="text-brand-500">*</span>
+                            </label>
+                            <div class="relative">
+                                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 text-sm font-semibold">Rp</span>
+                                <input id="inkubasi-modal" type="number" min="0" placeholder="500000"
+                                    class="w-full border border-slate-200 rounded-xl pl-10 pr-4 py-3 text-sm bg-slate-50 text-slate-800 placeholder-slate-400 transition-all" />
+                            </div>
+                        </div>
+
+                        <!-- Generate button — listener in app.js -->
+                        <button id="btn-generate-ide"
+                            class="btn-primary w-full bg-brand-500 hover:bg-brand-600 text-white font-bold py-3.5 rounded-xl text-sm flex items-center justify-center gap-2 shadow-md">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.347.346A3.5 3.5 0 0118 19h-6a3.5 3.5 0 01-3.464-3.077l-.347-.346z" />
+                            </svg>
+                            Hasilkan 3 Ide Bisnis dengan AI
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Loading state -->
+                <div id="inkubasi-loading" class="hidden flex flex-col items-center justify-center py-12 gap-4">
+                    <div class="spinner"></div>
+                    <p class="text-slate-500 text-sm font-medium animate-pulse-soft">
+                        AI sedang menganalisis kondisimu dan menyiapkan ide terbaik...
+                    </p>
+                </div>
+
+                <!-- Results -->
+                <div id="inkubasi-results" class="hidden space-y-5">
+                    <div class="flex items-center justify-between mb-2">
+                        <h2 class="text-lg font-bold text-slate-800">✨ 3 Ide Bisnis Untukmu</h2>
+                        <!-- Regenerate — listener in app.js -->
+                        <button id="btn-regenerate"
+                            class="text-xs font-semibold text-brand-500 hover:text-brand-600 border border-brand-200 hover:border-brand-400 px-3 py-1.5 rounded-lg transition-all flex items-center gap-1">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                            </svg>
+                            Cari Ide Lain
+                        </button>
+                    </div>
+                    <!-- Cards injected by ui.js renderChoiceCards() -->
+                    <div id="cards-container" class="space-y-5"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ─────────────────────────────────────────────────────────────
+             MENU 2: PROMOSI HARIAN
+        ───────────────────────────────────────────────────────────── -->
+        <section id="view-promosi" class="view-section">
+
+            <!-- Hero header -->
+            <div class="text-center mb-10">
+                <span class="inline-block px-3 py-1 bg-brand-100 text-brand-600 text-xs font-bold rounded-full uppercase tracking-widest mb-4">
+                    Fase 2 — Promosi Harian
+                </span>
+                <h1 class="text-3xl sm:text-4xl font-extrabold text-slate-900 leading-tight mb-3">
+                    Generator Konten<br />
+                    <span class="text-brand-500">Multisaluran</span>
+                </h1>
+                <p class="text-slate-500 max-w-xl mx-auto text-base">
+                    Pilih profilmu, lihat roadmap bisnismu, lalu ketik perintah promosi harian — AI siap membuat konten
+                    WA, IG, FB, dan TikTok sekaligus.
+                </p>
+            </div>
+
+            <div class="max-w-3xl mx-auto space-y-6">
+
+                <!-- Profile Selector -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+                    <h2 class="text-base font-bold text-slate-800 mb-4 flex items-center gap-2">
+                        <span class="w-7 h-7 rounded-lg bg-brand-500 text-white text-xs flex items-center justify-center font-bold">1</span>
+                        Pilih Profil Bisnismu
+                    </h2>
+
+                    <div class="flex gap-3 items-center">
+                        <div class="relative flex-1">
+                            <!-- change listener attached in app.js -->
+                            <select id="promosi-user-select"
+                                class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm bg-slate-50 text-slate-800 appearance-none cursor-pointer transition-all">
+                                <option value="">-- Pilih nama profil --</option>
+                            </select>
+                            <svg class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none"
+                                fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </div>
+                        <!-- Refresh button — listener attached in app.js via title attr selector -->
+                        <button title="Refresh daftar profil"
+                            class="p-3 rounded-xl border border-slate-200 hover:border-brand-300 hover:bg-brand-50 transition-all">
+                            <svg class="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" stroke-width="2"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <!-- Selected profile badge — toggled by ui.js renderProfileBadge() -->
+                    <div id="promosi-profile-info"
+                        class="hidden mt-4 bg-brand-50 border border-brand-100 rounded-xl px-4 py-3 flex items-center gap-3">
+                        <div id="promosi-profile-avatar"
+                            class="w-10 h-10 rounded-full bg-brand-500 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">?</div>
+                        <div>
+                            <p id="promosi-profile-name" class="font-semibold text-slate-800 text-sm">-</p>
+                            <p id="promosi-profile-ide"  class="text-xs text-slate-500">-</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Roadmap Widget — filled by ui.js renderRoadmapWidget() -->
+                <div id="roadmap-widget" class="hidden bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+                    <h2 class="text-base font-bold text-slate-800 mb-1 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-brand-500" fill="none" stroke="currentColor" stroke-width="2.2"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                        </svg>
+                        Rencana Aksi 4 Minggu Anda
+                    </h2>
+                    <p class="text-xs text-slate-400 mb-5">Roadmap bisnis yang telah dipilih saat inkubasi.</p>
+                    <div id="roadmap-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"></div>
+                </div>
+
+                <!-- Tipe Strategi Konten -->
+                <div id="promosi-tipe-section" class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+                    <h2 class="text-base font-bold text-slate-800 mb-4 flex items-center gap-2">
+                        <span class="w-7 h-7 rounded-lg bg-brand-500 text-white text-xs flex items-center justify-center font-bold">2</span>
+                        Pilih Strategi Konten
+                    </h2>
+                    <div class="relative flex-1">
+                        <select id="promosi-tipe-select"
+                            class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm bg-slate-50 text-slate-800 appearance-none cursor-pointer transition-all">
+                            <option value="Perkenalan / Biar Terkenal (TOFU)">📢 Perkenalan / Biar Terkenal (Menarik pembeli baru)</option>
+                            <option value="Edukasi / Bikin Yakin (MOFU)">🤝 Edukasi / Bikin Yakin (Meyakinkan calon pembeli)</option>
+                            <option value="Beli Sekarang / Promo Penjualan (BOFU)">💰 Beli Sekarang / Promo (Mengajak transaksi)</option>
+                        </select>
+                        <svg class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none"
+                            fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Daily Prompt Input -->
+                <div id="promosi-form-section" class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+                    <h2 class="text-base font-bold text-slate-800 mb-4 flex items-center gap-2">
+                        <span class="w-7 h-7 rounded-lg bg-brand-500 text-white text-xs flex items-center justify-center font-bold">3</span>
+                        Ketik Perintah Promosi Harian
+                    </h2>
+                    <div class="space-y-4">
+                        <div>
+                            <textarea id="promosi-perintah" rows="3"
+                                placeholder="Contoh: diskon jumat berkah beli 2 gratis 1, stok terbatas…"
+                                class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm bg-slate-50 text-slate-800 placeholder-slate-400 resize-none transition-all"></textarea>
+                            <p class="text-xs text-slate-400 mt-1">
+                                Gunakan bahasa natural. AI akan otomatis menyesuaikan dengan profil bisnis Anda.
+                            </p>
+                        </div>
+                        <!-- Generate promosi button — listener in app.js -->
+                        <button id="btn-generate-promosi"
+                            class="btn-primary w-full bg-brand-500 hover:bg-brand-600 text-white font-bold py-3.5 rounded-xl text-sm flex items-center justify-center gap-2 shadow-md">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.2"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                            </svg>
+                            Buat Konten 4 Platform Sekaligus
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Loading state -->
+                <div id="promosi-loading" class="hidden flex flex-col items-center justify-center py-12 gap-4">
+                    <div class="spinner"></div>
+                    <p class="text-slate-500 text-sm font-medium animate-pulse-soft">
+                        AI sedang menyusun konten untuk 4 platform...
+                    </p>
+                </div>
+
+                <!-- Output Tabs — shown after generation -->
+                <div id="promosi-output" class="hidden bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+                    <h2 class="text-base font-bold text-slate-800 mb-5 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-brand-500" fill="none" stroke="currentColor" stroke-width="2.2"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                        </svg>
+                        Konten Siap Sebarkan 🎉
+                    </h2>
+
+                    <!-- Tab Buttons — listeners in app.js -->
+                    <div class="flex gap-2 mb-5 flex-wrap">
+                        <button id="tab-wa"
+                            class="tab-btn active-tab px-4 py-2 rounded-xl text-xs font-bold border border-transparent flex items-center gap-1.5">
+                            <span class="text-base">💬</span> WhatsApp
+                        </button>
+                        <button id="tab-ig"
+                            class="tab-btn px-4 py-2 rounded-xl text-xs font-bold bg-slate-100 text-slate-600 border border-transparent flex items-center gap-1.5">
+                            <span class="text-base">📸</span> Instagram
+                        </button>
+                        <button id="tab-fb"
+                            class="tab-btn px-4 py-2 rounded-xl text-xs font-bold bg-slate-100 text-slate-600 border border-transparent flex items-center gap-1.5">
+                            <span class="text-base">👥</span> Facebook
+                        </button>
+                        <button id="tab-tiktok"
+                            class="tab-btn px-4 py-2 rounded-xl text-xs font-bold bg-slate-100 text-slate-600 border border-transparent flex items-center gap-1.5">
+                            <span class="text-base">🎵</span> TikTok
+                        </button>
+                    </div>
+
+                    <!-- Tab Content Panels — filled by ui.js renderPromoTabs() -->
+                    <div id="tab-content-wa"
+                        class="promosi-tab-content bg-slate-50 h-auto rounded-xl p-4 text-sm text-slate-700 whitespace-pre-wrap leading-relaxed border border-slate-100"></div>
+                    <div id="tab-content-ig"
+                        class="promosi-tab-content hidden h-auto bg-slate-50 rounded-xl p-4 text-sm text-slate-700 whitespace-pre-wrap leading-relaxed border border-slate-100"></div>
+                    <div id="tab-content-fb"
+                        class="promosi-tab-content hidden h-auto bg-slate-50 rounded-xl p-4 text-sm text-slate-700 whitespace-pre-wrap leading-relaxed border border-slate-100"></div>
+                    <div id="tab-content-tiktok"
+                        class="promosi-tab-content hidden h-auto bg-slate-50 rounded-xl p-4 text-sm text-slate-700 whitespace-pre-wrap leading-relaxed border border-slate-100"></div>
+
+                    <!-- Copy button — data-action used by app.js event delegation -->
+                    <div class="mt-4 flex flex-wrap gap-2">
+                        <button id="btn-copy-tab" data-action="copy-tab"
+                            class="text-xs font-semibold text-brand-600 hover:text-brand-700 border border-brand-200 hover:border-brand-400 px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                            </svg>
+                            Salin Konten Aktif
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ─────────────────────────────────────────────────────────────
+             MENU 3: ADMIN
+        ───────────────────────────────────────────────────────────── -->
+        <section id="view-admin" class="view-section">
+
+            <!-- Hero header -->
+            <div class="text-center mb-10">
+                <span class="inline-block px-3 py-1 bg-slate-100 text-slate-600 text-xs font-bold rounded-full uppercase tracking-widest mb-4">
+                    Admin Panel
+                </span>
+                <h1 class="text-3xl sm:text-4xl font-extrabold text-slate-900 leading-tight mb-3">
+                    Konfigurasi &amp;<br />
+                    <span class="text-brand-500">Monitoring</span>
+                </h1>
+                <p class="text-slate-500 max-w-xl mx-auto text-base">
+                    Kelola API key dan pantau semua pengguna yang telah bergabung di platform MajuLokal.
+                </p>
+            </div>
+
+            <div class="max-w-4xl mx-auto space-y-6">
+
+                <!-- Admin Login Card -->
+                <div id="admin-login-card" class="bg-white rounded-2xl shadow-lg border border-slate-100 p-8 max-w-md mx-auto mt-8">
+                    <div class="text-center mb-6">
+                        <div class="w-12 h-12 rounded-full bg-brand-100 text-brand-600 flex items-center justify-center mx-auto mb-4">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                            </svg>
+                        </div>
+                        <h2 class="text-2xl font-extrabold text-slate-800">Login Admin</h2>
+                        <p class="text-sm text-slate-500 mt-2">Silakan masukkan kredensial Anda.</p>
+                    </div>
+                    <div class="space-y-4">
+                        <div>
+                            <label for="admin-username" class="block text-sm font-semibold text-slate-700 mb-1.5">Username</label>
+                            <input id="admin-username" type="text" placeholder="Masukkan username..."
+                                class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm bg-slate-50 text-slate-800 placeholder-slate-400 transition-all" />
+                        </div>
+                        <div>
+                            <label for="admin-password" class="block text-sm font-semibold text-slate-700 mb-1.5">Password</label>
+                            <input id="admin-password" type="password" placeholder="Masukkan password..."
+                                class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm bg-slate-50 text-slate-800 placeholder-slate-400 transition-all" />
+                        </div>
+                        <p id="admin-login-error" class="text-xs font-semibold text-red-600 hidden text-center">Username atau Password Salah!</p>
+                        <button id="btn-admin-login"
+                            class="btn-primary w-full bg-brand-500 hover:bg-brand-600 text-white font-bold py-3.5 rounded-xl text-sm flex items-center justify-center gap-2 shadow-md transition-all mt-2">
+                            Masuk
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Dashboard Panel (Hidden by default) -->
+                <div id="admin-dashboard-panel" class="hidden space-y-6">
+
+                <!-- Credential Manager -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+                    <h2 class="text-base font-bold text-slate-800 mb-1 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-brand-500" fill="none" stroke="currentColor" stroke-width="2.2"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+                        </svg>
+                        Gemini API Key Manager
+                    </h2>
+                    <p class="text-xs text-slate-400 mb-4">Kunci disimpan aman di localStorage browser Anda, tidak di server.</p>
+
+                    <div class="flex gap-3">
+                        <div class="relative flex-1">
+                            <input id="admin-gemini-key" type="password"
+                                placeholder="Masukkan Gemini API Key Anda..."
+                                class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm bg-slate-50 text-slate-800 placeholder-slate-400 transition-all pr-12" />
+                            <!-- Toggle visibility — listener in app.js -->
+                            <button id="btn-toggle-key-visibility"
+                                class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                                title="Tampilkan/sembunyikan" aria-label="Toggle API key visibility">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                </svg>
+                            </button>
+                        </div>
+                        <!-- Save button — listener in app.js -->
+                        <button id="btn-save-gemini-key"
+                            class="btn-primary bg-brand-500 hover:bg-brand-600 text-white font-bold px-5 py-3 rounded-xl text-sm flex-shrink-0 shadow-md flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                            </svg>
+                            Simpan
+                        </button>
+                    </div>
+
+                    <!-- Status indicator — filled by ui.js renderAdminKeyStatus() -->
+                    <div id="admin-key-status" class="hidden mt-3 text-xs font-semibold flex items-center gap-1.5"></div>
+                </div>
+
+                <!-- User Monitoring Table -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+                    <div class="flex items-center justify-between mb-5">
+                        <h2 class="text-base font-bold text-slate-800 flex items-center gap-2">
+                            <svg class="w-5 h-5 text-brand-500" fill="none" stroke="currentColor" stroke-width="2.2"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                            Daftar Pengguna Terdaftar
+                        </h2>
+                        <!-- Refresh table — listener in app.js -->
+                        <button id="btn-refresh-admin-table"
+                            class="text-xs font-semibold text-brand-500 hover:text-brand-600 border border-brand-200 hover:border-brand-400 px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                            </svg>
+                            Refresh
+                        </button>
+                    </div>
+
+                    <!-- Loading indicator -->
+                    <div id="admin-table-loading" class="hidden flex items-center justify-center py-8 gap-3">
+                        <div class="spinner"></div>
+                        <span class="text-slate-500 text-sm">Memuat data...</span>
+                    </div>
+
+                    <!-- Empty state -->
+                    <div id="admin-table-empty" class="hidden text-center py-10">
+                        <svg class="w-12 h-12 text-slate-200 mx-auto mb-3" fill="none" stroke="currentColor"
+                            stroke-width="1.5" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                        </svg>
+                        <p class="text-slate-400 text-sm">Belum ada pengguna terdaftar.</p>
+                    </div>
+
+                    <!-- Data table — rows injected by ui.js renderAdminTable() -->
+                    <div class="overflow-x-auto rounded-xl border border-slate-100">
+                        <table id="admin-table" class="w-full text-sm hidden">
+                            <thead>
+                                <tr class="bg-slate-50 text-left border-b border-slate-100">
+                                    <th class="px-4 py-3 font-semibold text-slate-600 text-xs">Nama</th>
+                                    <th class="px-4 py-3 font-semibold text-slate-600 text-xs">Modal Awal</th>
+                                    <th class="px-4 py-3 font-semibold text-slate-600 text-xs hidden sm:table-cell">Kondisi</th>
+                                    <th class="px-4 py-3 font-semibold text-slate-600 text-xs">Ide Terpilih</th>
+                                    <th class="px-4 py-3 font-semibold text-slate-600 text-xs text-center">Promosi</th>
+                                    <th class="px-4 py-3 font-semibold text-slate-600 text-xs">Daftar</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admin-table-body" class="divide-y divide-slate-50"></tbody>
+                        </table>
+                    </div>
+
+                    <!-- Summary stats — shown by ui.js renderAdminTable() -->
+                    <div id="admin-stats" class="hidden mt-5 grid grid-cols-2 sm:grid-cols-3 gap-4">
+                        <div class="bg-brand-50 rounded-xl p-4 text-center">
+                            <p id="stat-total-users"   class="text-2xl font-extrabold text-brand-500">0</p>
+                            <p class="text-xs text-slate-500 font-medium mt-1">Total Pengguna</p>
+                        </div>
+                        <div class="bg-slate-50 rounded-xl p-4 text-center">
+                            <p id="stat-total-promosi" class="text-2xl font-extrabold text-slate-700">0</p>
+                            <p class="text-xs text-slate-500 font-medium mt-1">Total Konten Dibuat</p>
+                        </div>
+                        <div class="bg-slate-50 rounded-xl p-4 text-center col-span-2 sm:col-span-1">
+                            <p id="stat-avg-modal"     class="text-2xl font-extrabold text-slate-700">Rp0</p>
+                            <p class="text-xs text-slate-500 font-medium mt-1">Rata-rata Modal</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Danger Zone -->
+                <div class="bg-red-50 border border-red-100 rounded-2xl p-5">
+                    <h3 class="text-sm font-bold text-red-700 mb-2 flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        </svg>
+                        Zona Bahaya
+                    </h3>
+                    <p class="text-xs text-red-600 mb-3">Menghapus API key dari localStorage. Fitur AI tidak akan berfungsi setelah ini.</p>
+                    <!-- Clear key button — listener in app.js -->
+                    <button id="btn-clear-gemini-key"
+                        class="text-xs font-semibold text-red-600 hover:text-red-700 border border-red-200 hover:border-red-400 px-3 py-1.5 rounded-lg transition-all">
+                        Hapus API Key
+                    </button>
+                </div>
+
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="mt-16 border-t border-slate-100 bg-white">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 py-6 flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div class="flex items-center gap-2">
+                <div class="w-6 h-6 rounded-lg bg-brand-500 flex items-center justify-center">
+                    <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" stroke-width="2.5"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                </div>
+                <span class="text-sm font-bold text-slate-700">Maju<span class="text-brand-500">Lokal</span></span>
+            </div>
+            <p class="text-xs text-slate-400 text-center">
+                AI Business Launchpad untuk UMKM Indonesia. Ditenagai Gemini &amp; Supabase.
+            </p>
+            <p class="text-xs text-slate-400">© 2026 MajuLokal</p>
+        </div>
+    </footer>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="fixed bottom-6 right-6 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         Entry point — ES6 module. All logic lives in src/js/app.js
+    ═══════════════════════════════════════════════════════════════ -->
+    <script type="module" src="src/js/app.js"></script>
+
+</body>
+
+</html>
