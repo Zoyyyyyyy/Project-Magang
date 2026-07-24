@@ -121,7 +121,7 @@ CREATE TABLE public.admin_accounts (
 ### 1. Clone Repository
 ```
 Bash
-git clone [https://github.com/username/MajuLokal.git](https://github.com/username/MajuLokal.git)
+git clone [https://github.com/Zoyyyyyyy/MajuLokal.git](https://github.com/Zoyyyyyyy/MajuLokal.git)
 cd MajuLokal
 ```
 ### 2. Konfigurasi Database & API Key
