@@ -103,18 +103,18 @@ CREATE TABLE public.admin_accounts (
 ```
 ## 🕹️ Alur Penggunaan Aplikasi
 ### 1. Program Inkubasi Bisnis
-- Buka menu Inkubasi Bisnis.
-- Masukkan Nama Lengkap, Ceritakan Kondisimu, dan Perkiraan Modal Awal (Rp).
-- Klik Hasilkan 3 Ide Bisnis dengan AI.
-- Pilih salah satu ide bisnis favorit, lalu klik Lanjutkan ke Rencana Aksi 4 Minggu.
+1. Buka menu Inkubasi Bisnis.
+2. Masukkan Nama Lengkap, Ceritakan Kondisimu, dan Perkiraan Modal Awal (Rp).
+3. Klik Hasilkan 3 Ide Bisnis dengan AI.
+4. Pilih salah satu ide bisnis favorit, lalu klik Lanjutkan ke Rencana Aksi 4 Minggu.
 
 ### 2. Promosi Harian 
-- Buka menu Promosi Harian.
-- Pilih Profil Bisnis yang sudah dibuat (Roadmap aksi 4 minggu akan otomatis muncul sebagai referensi). 
-- Pilih Strategi Konten yang ingin digunakan (contoh: Perkenalan / Biar Terkenal).
-- Ketik Perintah Promosi Harian (contoh: "diskon jumat berkah beli 2 gratis 1, stok terbatas").
-- Klik Buat Konten 4 Platform Sekaligus.
-- Pilih tab sosial media yang diinginkan (WhatsApp / Instagram / Facebook / TikTok) dan klik Salin Konten Aktif untuk siap posting!
+1. Buka menu Promosi Harian.
+2. Pilih Profil Bisnis yang sudah dibuat (Roadmap aksi 4 minggu akan otomatis muncul sebagai referensi). 
+3. Pilih Strategi Konten yang ingin digunakan (contoh: Perkenalan / Biar Terkenal).
+4. Ketik Perintah Promosi Harian (contoh: "diskon jumat berkah beli 2 gratis 1, stok terbatas").
+5. Klik Buat Konten 4 Platform Sekaligus.
+6. Pilih tab sosial media yang diinginkan (WhatsApp / Instagram / Facebook / TikTok) dan klik Salin Konten Aktif untuk siap posting!
 
 
 ## 🚀 Cara Menjalankan Secara Lokal
@@ -124,6 +124,7 @@ Bash
 git clone [https://github.com/Zoyyyyyyy/MajuLokal.git](https://github.com/Zoyyyyyyy/MajuLokal.git)
 cd MajuLokal
 ```
+
 ### 2. Konfigurasi Database & API Key
 Buka file src/js/supabase.js dan src/js/ai.js, lalu sesuaikan kredensial berikut:
 ```
@@ -132,7 +133,18 @@ JavaScript
 const SUPABASE_URL = '[https://ksbjkgcorfmdabneaoyl.supabase.co](https://ksbjkgcorfmdabneaoyl.supabase.co)';
 const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
 ```
-### 3. Jalankan Aplikasi
+
+### 3. Panel Admin & Konfigurasi Sistem
+1. Buka menu **Admin** pada bilah navigasi kanan atas.
+2. Masukkan kredensial akun demo untuk login:
+   - **Username**: `demouser`
+   - **Password**: `demo12345`
+3. Setelah berhasil masuk ke **Admin Panel (Konfigurasi & Monitoring)**, Anda dapat mengakses fitur-fitur berikut:
+   - **Gemini API Key Manager** — Mengelola dan menyimpan API Key Google Gemini secara aman di *localStorage* browser.
+   - **Daftar Pengguna Terdaftar** — Memantau daftar pelaku UMKM yang telah bergabung, rincian modal awal, kondisi lingkungan, ide bisnis terpilih, serta jumlah konten promosi yang telah dihasilkan.
+   - **Metrik & Ringkasan Statistik** — Melihat ringkasan data secara *real-time* meliputi **Total Pengguna**, **Total Konten Dibuat**, dan **Rata-rata Modal** seluruh UMKM.
+   
+### 4. Jalankan Aplikasi
 Jalankan file index.html menggunakan ekstensi Live Server di IDE pilihan Anda (seperti VS Code atau AntiGravity IDE).
 ```
 📁 Struktur Project
