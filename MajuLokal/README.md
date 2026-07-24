@@ -23,14 +23,14 @@
 
 ## ✨ Fitur Utama
 
-- 🌱 **Inkubasi Bisnis 4 Minggu (Fase 1 - 3)**:
+### 🌱 **Inkubasi Bisnis 4 Minggu (Fase 1 - 3)**:
   - **Fase 1: Eksplorasi Ide Bisnis** — Memproses latar belakang pengguna dan modal awal untuk merumuskan 3 opsi ide bisnis yang paling rasional.
   - **Fase 2: Rencana Aksi 4 Minggu** — Menyusun langkah operasional terstruktur minggu demi minggu yang mudah dieksekusi oleh orang awam.
   - **Fase 3: Analisis Modal & Keuangan** — Mengkalkulasi alokasi modal awal, estimasi harga jual, dan target Break Even Point (BEP).
-- 📣 **Generator Promosi Harian (4-in-1 Multi-Platform)**:
+### 📣 **Generator Promosi Harian (4-in-1 Multi-Platform)**:
   - Menghasilkan caption promosi, ide visual (foto/video), dan petunjuk instruksi pembuatan konten yang dipersonalisasi khusus untuk **WhatsApp, Instagram, Facebook, dan TikTok** sekaligus.
   - Teks caption dibuat ringkas, komunikatif, ramah pemula, dan siap disalin dalam satu klik.
-- ⚙️ **Panel Admin & Manajemen Database**:
+### ⚙️ **Panel Admin & Manajemen Database**:
   - Menyimpan riwayat inkubasi dan ide promosi harian ke database Supabase secara *real-time*.
   - Menyediakan ringkasan statistik penggunaan platform dan manajemen konfigurasi sistem.
 
@@ -101,30 +101,30 @@ CREATE TABLE public.admin_accounts (
   CONSTRAINT admin_accounts_pkey PRIMARY KEY (id)
 );
 ```
-🕹️ Alur Penggunaan Aplikasi
-1. Program Inkubasi Bisnis
-- 1. Buka menu Inkubasi Bisnis.
-- 2. Masukkan Nama Lengkap, Ceritakan Kondisimu, dan Perkiraan Modal Awal (Rp).
-- 3. Klik Hasilkan 3 Ide Bisnis dengan AI.
-- 4. Pilih salah satu ide bisnis favorit, lalu klik Lanjutkan ke Rencana Aksi 4 Minggu.
+## 🕹️ Alur Penggunaan Aplikasi
+### 1. Program Inkubasi Bisnis
+- Buka menu Inkubasi Bisnis.
+- Masukkan Nama Lengkap, Ceritakan Kondisimu, dan Perkiraan Modal Awal (Rp).
+- Klik Hasilkan 3 Ide Bisnis dengan AI.
+- Pilih salah satu ide bisnis favorit, lalu klik Lanjutkan ke Rencana Aksi 4 Minggu.
 
-2. Promosi Harian 
-- 1. Buka menu Promosi Harian.
-- 2. Pilih Profil Bisnis yang sudah dibuat (Roadmap aksi 4 minggu akan otomatis muncul sebagai referensi). 
-- 3. Pilih Strategi Konten yang ingin digunakan (contoh: Perkenalan / Biar Terkenal).
-- 4. Ketik Perintah Promosi Harian (contoh: "diskon jumat berkah beli 2 gratis 1, stok terbatas").
-- 5. Klik Buat Konten 4 Platform Sekaligus.
-- 6. Pilih tab sosial media yang diinginkan (WhatsApp / Instagram / Facebook / TikTok) dan klik Salin Konten Aktif untuk siap posting!
+### 2. Promosi Harian 
+- Buka menu Promosi Harian.
+- Pilih Profil Bisnis yang sudah dibuat (Roadmap aksi 4 minggu akan otomatis muncul sebagai referensi). 
+- Pilih Strategi Konten yang ingin digunakan (contoh: Perkenalan / Biar Terkenal).
+- Ketik Perintah Promosi Harian (contoh: "diskon jumat berkah beli 2 gratis 1, stok terbatas").
+- Klik Buat Konten 4 Platform Sekaligus.
+- Pilih tab sosial media yang diinginkan (WhatsApp / Instagram / Facebook / TikTok) dan klik Salin Konten Aktif untuk siap posting!
 
 
-🚀 Cara Menjalankan Secara Lokal
-- 1. Clone Repository
+## 🚀 Cara Menjalankan Secara Lokal
+### 1. Clone Repository
 ```
 Bash
 git clone [https://github.com/username/MajuLokal.git](https://github.com/username/MajuLokal.git)
 cd MajuLokal
 ```
-- 2. Konfigurasi Database & API Key
+### 2. Konfigurasi Database & API Key
 Buka file src/js/supabase.js dan src/js/ai.js, lalu sesuaikan kredensial berikut:
 ```
 JavaScript
@@ -132,7 +132,7 @@ JavaScript
 const SUPABASE_URL = '[https://ksbjkgcorfmdabneaoyl.supabase.co](https://ksbjkgcorfmdabneaoyl.supabase.co)';
 const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
 ```
-- 3. Jalankan Aplikasi
+### 3. Jalankan Aplikasi
 Jalankan file index.html menggunakan ekstensi Live Server di IDE pilihan Anda (seperti VS Code atau AntiGravity IDE).
 ```
 📁 Struktur Project
