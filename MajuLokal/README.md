@@ -101,6 +101,7 @@ CREATE TABLE public.admin_accounts (
   CONSTRAINT admin_accounts_pkey PRIMARY KEY (id)
 );
 ```
+---
 ## 🕹️ Alur Penggunaan Aplikasi
 ### 1. Program Inkubasi Bisnis
 1. Buka menu Inkubasi Bisnis.
@@ -116,6 +117,16 @@ CREATE TABLE public.admin_accounts (
 5. Klik Buat Konten 4 Platform Sekaligus.
 6. Pilih tab sosial media yang diinginkan (WhatsApp / Instagram / Facebook / TikTok) dan klik Salin Konten Aktif untuk siap posting!
 
+### 3. Panel Admin & Konfigurasi Sistem
+1. Buka menu **Admin** pada bilah navigasi kanan atas.
+2. Masukkan kredensial akun demo untuk login:
+   - **Username**: `demouser`
+   - **Password**: `demo12345`
+3. Setelah berhasil masuk ke **Admin Panel (Konfigurasi & Monitoring)**, Anda dapat mengakses fitur-fitur berikut:
+   - **Gemini API Key Manager** — Mengelola dan menyimpan API Key Google Gemini secara aman di *localStorage* browser.
+   - **Daftar Pengguna Terdaftar** — Memantau daftar pelaku UMKM yang telah bergabung, rincian modal awal, kondisi lingkungan, ide bisnis terpilih, serta jumlah konten promosi yang telah dihasilkan.
+   - **Metrik & Ringkasan Statistik** — Melihat ringkasan data secara *real-time* meliputi **Total Pengguna**, **Total Konten Dibuat**, dan **Rata-rata Modal** seluruh UMKM.
+---
 
 ## 🚀 Cara Menjalankan Secara Lokal
 ### 1. Clone Repository
@@ -134,17 +145,7 @@ const SUPABASE_URL = '[https://ksbjkgcorfmdabneaoyl.supabase.co](https://ksbjkgc
 const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
 ```
 
-### 3. Panel Admin & Konfigurasi Sistem
-1. Buka menu **Admin** pada bilah navigasi kanan atas.
-2. Masukkan kredensial akun demo untuk login:
-   - **Username**: `demouser`
-   - **Password**: `demo12345`
-3. Setelah berhasil masuk ke **Admin Panel (Konfigurasi & Monitoring)**, Anda dapat mengakses fitur-fitur berikut:
-   - **Gemini API Key Manager** — Mengelola dan menyimpan API Key Google Gemini secara aman di *localStorage* browser.
-   - **Daftar Pengguna Terdaftar** — Memantau daftar pelaku UMKM yang telah bergabung, rincian modal awal, kondisi lingkungan, ide bisnis terpilih, serta jumlah konten promosi yang telah dihasilkan.
-   - **Metrik & Ringkasan Statistik** — Melihat ringkasan data secara *real-time* meliputi **Total Pengguna**, **Total Konten Dibuat**, dan **Rata-rata Modal** seluruh UMKM.
-   
-### 4. Jalankan Aplikasi
+### 3. Jalankan Aplikasi
 Jalankan file index.html menggunakan ekstensi Live Server di IDE pilihan Anda (seperti VS Code atau AntiGravity IDE).
 ```
 📁 Struktur Project
