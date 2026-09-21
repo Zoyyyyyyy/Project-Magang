@@ -29,7 +29,7 @@
 - 🔐 **Autentikasi Multi-Role** — Akses terpisah untuk **Owner (Pemilik)** dan **Kasir**.
 - 🛒 **POS Kasir Interaktif** — Pilihan cepat *Dine In* (Makan di Tempat) dan *Take Away* (Bungkus) dengan akumulasi biaya otomatis tanpa perlu cetak struk fisik.
 - 📋 **Manajemen Menu & Storage** — Atur Harga Jual, Modal Normal, Modal Takeaway, serta upload foto produk ke **Supabase Storage**.
-- 💸 **Expense Tracker** — Pencatatan belanja bahan baku & operasional harian untuk perhitungan laba bersih presisi.
+- 💸 **Expense Tracker** — Pencatatan belanja bahan baku & operasional harian untuk perhitungan laba bersih presisi
 - ⏰ **Rekap Automasi (Reset 03:00 WIB)** — Penjadwalan *Cron Job* otomatis jam 03:00 AM WIB untuk merangkum total omset, pengeluaran, dan laba bersih harian.
 - 📄 **Export Laporan PDF** — Unduh laporan rekap harian, bulanan, dan tahunan dalam format PDF.
 - 🤖 **AI Business Analytics** — Rekomendasi dan analisis strategi bisnis otomatis menggunakan Google Gemini AI API (Key dapat dikonfigurasi dinamis via Halaman Pengaturan).
